@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'util.dart';
 import 'theme.dart';
+import 'pages/home_page.dart';
+import 'pages/map.dart';
 
 void main() {
   runApp(const MainApp());
@@ -17,45 +19,40 @@ class _MainAppState extends State<MainApp> {
   // The current theme mode
   ThemeMode _themeMode = ThemeMode.light;
 
+  void _toggleTheme() {
+    setState(() {
+      _themeMode =
+          _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     TextTheme textTheme = createTextTheme(context, "Roboto", "Roboto");
     MaterialTheme theme = MaterialTheme(textTheme);
 
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: theme.light(),
       darkTheme: theme.dark(),
       themeMode: _themeMode,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Theme Switcher'),
-          actions: [
-            Row(
-              children: [
-                const Icon(Icons.light_mode),
-                Switch(
-                  value: _themeMode == ThemeMode.dark,
-                  onChanged: (value) {
-                    setState(() {
-                      _themeMode = value ? ThemeMode.dark : ThemeMode.light;
-                    });
-                  },
-                ),
-                const Icon(Icons.dark_mode),
-              ],
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomePage(
+              toggleTheme: _toggleTheme,
+              currentThemeMode: _themeMode,
             ),
-          ],
-        ),
-        body: const Center(
-          child: Text('Hello World!'),
-        ),
-      ),
+        '/map': (context) => Map(
+              toggleTheme: _toggleTheme,
+              currentThemeMode: _themeMode,
+            ),
+      },
     );
   }
 }
 
 
-// Example usage:
+// Example usage of colortheme and texttheme:
 // Container(
 //   color: Theme.of(context).colorScheme.primary,
 //   child: Text('Themed Container', style: Theme.of(context).textTheme.bodyLarge),
