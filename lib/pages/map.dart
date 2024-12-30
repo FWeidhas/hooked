@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart'; // Import GetX
 import '../drawer.dart';
+import '../controller/themecontroller.dart'; // Import the ThemeController
 
 class Map extends StatelessWidget {
-  final VoidCallback toggleTheme; // Function to toggle theme
-  final ThemeMode currentThemeMode; // Current theme mode
-
-  const Map({
-    super.key,
-    required this.toggleTheme,
-    required this.currentThemeMode,
-  });
+  const Map({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Get the ThemeController instance using Get.find()
+    ThemeController themeController = Get.find();
+
     // Access the primary color from the theme
     Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
 
@@ -26,20 +24,24 @@ class Map extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.light_mode),
             onPressed: () {
-              toggleTheme(); // Trigger theme toggle (light mode)
+              themeController
+                  .toggleTheme(); // Trigger theme toggle (light mode)
             },
           ),
-          Switch(
-            value: currentThemeMode ==
-                ThemeMode.dark, // Set switch based on current theme
-            onChanged: (value) {
-              toggleTheme(); // Call toggleTheme when the switch is toggled
-            },
-          ),
+          Obx(() {
+            return Switch(
+              value: themeController.themeMode ==
+                  ThemeMode.dark, // Set switch based on current theme
+              onChanged: (value) {
+                themeController
+                    .toggleTheme(); // Call toggleTheme when the switch is toggled
+              },
+            );
+          }),
           IconButton(
             icon: const Icon(Icons.dark_mode),
             onPressed: () {
-              toggleTheme(); // Trigger theme toggle (dark mode)
+              themeController.toggleTheme(); // Trigger theme toggle (dark mode)
             },
           ),
         ],

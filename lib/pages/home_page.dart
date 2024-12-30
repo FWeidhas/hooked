@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../drawer.dart';
+import '../controller/themecontroller.dart'; // Import ThemeController
 
 class HomePage extends StatelessWidget {
-  final VoidCallback toggleTheme; // Function to toggle theme
-  final ThemeMode currentThemeMode; // Current theme mode
-
-  const HomePage({
-    super.key,
-    required this.toggleTheme,
-    required this.currentThemeMode,
-  });
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Get the ThemeController instance using Get.find()
+    ThemeController themeController = Get.find();
+
     // Access the primary color from the theme
     Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
 
@@ -22,24 +20,27 @@ class HomePage extends StatelessWidget {
         backgroundColor:
             primaryColor, // Set the AppBar background color to primary
         actions: [
-          // Add the Light/Dark mode switch here
+          // Switch widget to toggle between light and dark mode
           IconButton(
             icon: const Icon(Icons.light_mode),
             onPressed: () {
-              toggleTheme(); // Trigger theme toggle (light mode)
+              themeController
+                  .toggleTheme(); // Toggle theme using GetX controller
             },
           ),
           Switch(
-            value: currentThemeMode ==
-                ThemeMode.dark, // Set switch based on current theme
+            value: themeController.themeMode ==
+                ThemeMode.dark, // Check the current theme mode
             onChanged: (value) {
-              toggleTheme(); // Call toggleTheme when the switch is toggled
+              themeController
+                  .toggleTheme(); // Call toggleTheme when the switch is toggled
             },
           ),
           IconButton(
             icon: const Icon(Icons.dark_mode),
             onPressed: () {
-              toggleTheme(); // Trigger theme toggle (dark mode)
+              themeController
+                  .toggleTheme(); // Toggle theme using GetX controller
             },
           ),
         ],
