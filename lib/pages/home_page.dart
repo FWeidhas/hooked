@@ -19,8 +19,9 @@ class HomePage extends StatelessWidget {
         ],
       ),
       drawer: const CustomDrawer(),
-      body: const Center(
-        child: Text('Welcome to the Home Page!'),
+      body: Center(
+        child: Text('Welcome to the Home Page!',
+            style: Theme.of(context).textTheme.headlineMedium),
       ),
     );
   }

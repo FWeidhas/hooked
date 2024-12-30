@@ -24,9 +24,8 @@ TextTheme createTextTheme(
 
   // Apply colors from the color scheme
   return textTheme.apply(
-    bodyColor:
-        colorScheme.onBackground, // Adapt body text to the theme's color scheme
-    displayColor: colorScheme
-        .onBackground, // Adapt display text to the theme's color scheme
+    bodyColor: colorScheme.onSurface,
+    displayColor:
+        colorScheme.onSurface, // Adapt display text to the theme's color scheme
   );
 }
