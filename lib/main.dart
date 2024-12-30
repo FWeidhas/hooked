@@ -4,12 +4,10 @@ import 'util.dart';
 import 'theme.dart';
 import 'pages/home_page.dart';
 import 'pages/map.dart';
-import 'controller/themecontroller.dart'; // Import the theme controller
+import 'controller/themecontroller.dart';
 
 void main() {
-  // Initialize GetX and ThemeController
-  Get.put(
-      ThemeController()); // This will make the ThemeController globally accessible
+  Get.put(ThemeController());
 
   runApp(const MainApp());
 }
