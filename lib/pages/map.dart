@@ -19,8 +19,9 @@ class Map extends StatelessWidget {
         ],
       ),
       drawer: const CustomDrawer(),
-      body: const Center(
-        child: Text('Welcome to the Map Page!'),
+      body: Center(
+        child: Text('Welcome to the Map Page!',
+            style: Theme.of(context).textTheme.headlineMedium),
       ),
     );
   }
