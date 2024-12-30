@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import '../drawer.dart';
+import '../components/themetoggle.dart';
 
 class HomePage extends StatelessWidget {
-  final VoidCallback toggleTheme; // Function to toggle theme
-  final ThemeMode currentThemeMode; // Current theme mode
-
-  const HomePage({
-    super.key,
-    required this.toggleTheme,
-    required this.currentThemeMode,
-  });
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,29 +13,9 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Page'),
-        backgroundColor:
-            primaryColor, // Set the AppBar background color to primary
-        actions: [
-          // Add the Light/Dark mode switch here
-          IconButton(
-            icon: const Icon(Icons.light_mode),
-            onPressed: () {
-              toggleTheme(); // Trigger theme toggle (light mode)
-            },
-          ),
-          Switch(
-            value: currentThemeMode ==
-                ThemeMode.dark, // Set switch based on current theme
-            onChanged: (value) {
-              toggleTheme(); // Call toggleTheme when the switch is toggled
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.dark_mode),
-            onPressed: () {
-              toggleTheme(); // Trigger theme toggle (dark mode)
-            },
-          ),
+        backgroundColor: primaryColor,
+        actions: const [
+          ThemeToggleWidget(),
         ],
       ),
       drawer: const CustomDrawer(),

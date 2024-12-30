@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import '../drawer.dart';
+import '../components/themetoggle.dart';
 
 class Map extends StatelessWidget {
-  final VoidCallback toggleTheme; // Function to toggle theme
-  final ThemeMode currentThemeMode; // Current theme mode
-
-  const Map({
-    super.key,
-    required this.toggleTheme,
-    required this.currentThemeMode,
-  });
+  const Map({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -19,29 +13,9 @@ class Map extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Map Page'),
-        backgroundColor:
-            primaryColor, // Set the AppBar background color to primary
-        actions: [
-          // Add the Light/Dark mode switch here
-          IconButton(
-            icon: const Icon(Icons.light_mode),
-            onPressed: () {
-              toggleTheme(); // Trigger theme toggle (light mode)
-            },
-          ),
-          Switch(
-            value: currentThemeMode ==
-                ThemeMode.dark, // Set switch based on current theme
-            onChanged: (value) {
-              toggleTheme(); // Call toggleTheme when the switch is toggled
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.dark_mode),
-            onPressed: () {
-              toggleTheme(); // Trigger theme toggle (dark mode)
-            },
-          ),
+        backgroundColor: primaryColor,
+        actions: const [
+          ThemeToggleWidget(),
         ],
       ),
       drawer: const CustomDrawer(),
