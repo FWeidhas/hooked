@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hooked/components/themetoggle.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -19,7 +21,7 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      Navigator.pushReplacementNamed(context, '/');
+      Navigator.pushReplacementNamed(context, '/home');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: $e')),
@@ -29,13 +31,80 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
+      appBar: AppBar(
+        title: const Text("Login"),
+        backgroundColor: primaryColor,
+        actions: const [
+          ThemeToggleWidget(),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            Column(
+              children: [
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child:
+                          Icon(Icons.waves, size: 40, color: Colors.blueAccent),
+                    ),
+                    Align(
+                      alignment: Alignment.topCenter,
+                      child:
+                          Icon(Icons.waves, size: 40, color: Colors.blueAccent),
+                    ),
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child:
+                          Icon(Icons.waves, size: 40, color: Colors.blueAccent),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  "Welcome to Hooked",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  "Your guide for the best fishing spots",
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            const SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(FontAwesomeIcons.fish,
+                    size: 30,
+                    color: Theme.of(context).colorScheme.primaryContainer),
+                const SizedBox(width: 16),
+                Icon(FontAwesomeIcons.fish,
+                    size: 30,
+                    color: Theme.of(context).colorScheme.primaryContainer),
+                const SizedBox(width: 16),
+                Icon(FontAwesomeIcons.fish,
+                    size: 30,
+                    color: Theme.of(context).colorScheme.primaryContainer),
+              ],
+            ),
+            const SizedBox(height: 32),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: "Email"),

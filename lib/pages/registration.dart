@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart' as auth;
+import 'package:hooked/components/themetoggle.dart';
 import '../database/user_service.dart';
 import '../models/user.dart';
 
@@ -47,8 +48,16 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   @override
   Widget build(BuildContext context) {
+    Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
+
     return Scaffold(
-      appBar: AppBar(title: const Text("Register")),
+      appBar: AppBar(
+        title: const Text("Registration"),
+        backgroundColor: primaryColor,
+        actions: const [
+          ThemeToggleWidget(),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

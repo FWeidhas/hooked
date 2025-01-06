@@ -64,6 +64,7 @@ class MainApp extends StatelessWidget {
           },
         ),
         routes: {
+          '/home': (context) => const AuthGuard(child: HomePage()),
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
           '/map': (context) => const AuthGuard(child: Map()),

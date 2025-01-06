@@ -25,7 +25,7 @@ class CustomDrawer extends StatelessWidget {
             title: const Text('Home'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
-              Navigator.pushNamed(context, '/');
+              Navigator.pushNamed(context, '/home');
             },
           ),
           ListTile(
@@ -60,11 +60,12 @@ class CustomDrawer extends StatelessWidget {
               // Perform sign out
               await FirebaseAuth.instance.signOut();
 
-              // Only navigate if the widget is still mounted
-              if (!context.mounted) return;
-
-              // Navigate to the login page after logout
-              Navigator.pushReplacementNamed(context, '/login');
+              // Leere den Navigator-Stack und leite zur Login-Seite weiter
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login', // Zielroute
+                (route) => false, // Alle vorherigen Routen entfernen
+              );
             },
           ),
         ],
