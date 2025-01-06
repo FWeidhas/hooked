@@ -49,7 +49,7 @@ class MainApp extends StatelessWidget {
         initialRoute: '/',
         routes: {
           '/': (context) => const HomePage(),
-          '/map': (context) => const Map(),
+          '/map': (context) => const FishingMap(),
           '/fishing_spots': (context) => const FishingSpots(),
         },
       );

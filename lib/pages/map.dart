@@ -1,19 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../drawer.dart';
 import '../components/themetoggle.dart';
+import 'package:hooked/models/fishingSpot.dart';
+import '../database/fishing_spot_service.dart';
 
-class Map extends StatefulWidget {
-  const Map({super.key});
+class FishingMap extends StatefulWidget {
+  const FishingMap({super.key});
 
   @override
-  State<Map> createState() => _MapState();
+  State<FishingMap> createState() => _FishingMapState();
 }
 
-class _MapState extends State<Map> {
+class _FishingMapState extends State<FishingMap> {
   LatLng? userLocation;
+  List<Marker> fishingSpotsMarkers = [];
 
   @override
   void initState() {
@@ -72,7 +77,7 @@ class _MapState extends State<Map> {
 
   void _setFallbackLocation() {
     setState(() {
-      userLocation = LatLng(49.013432, 12.101624);
+      userLocation = const LatLng(49.013432, 12.101624); // Fallback location
     });
   }
 
@@ -91,33 +96,74 @@ class _MapState extends State<Map> {
       drawer: const CustomDrawer(),
       body: userLocation == null
           ? const Center(child: CircularProgressIndicator())
-          : FlutterMap(
-              options: MapOptions(
-                initialCenter: userLocation!,
-                initialZoom: 15.0,
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate:
-                      'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  subdomains: const ['a', 'b', 'c'],
-                  userAgentPackageName: 'de.othr.hooked',
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: userLocation!,
+          : StreamBuilder<QuerySnapshot>(
+              stream: getAllFishingSpots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+
+                if (snapshot.hasError) {
+                  return const Text('Something went wrong');
+                }
+
+                if (snapshot.hasData) {
+                  // Process the fishing spots data
+                  final fishingSpots = snapshot.data!.docs.map((doc) {
+                    Map<String, dynamic> data =
+                        doc.data() as Map<String, dynamic>;
+                    return FishingSpot.fromMap(data, doc.id);
+                  }).toList();
+
+                  // Create markers for each fishing spot
+                  fishingSpotsMarkers = fishingSpots.map((spot) {
+                    return Marker(
+                      point:
+                          LatLng(spot.latitude ?? 0.0, spot.longitude ?? 0.0),
                       width: 40,
                       height: 40,
                       child: const Icon(
                         Icons.location_pin,
-                        color: Color.fromARGB(255, 197, 56, 46),
+                        color: Color.fromARGB(255, 192, 41, 41),
                         size: 40,
                       ),
+                    );
+                  }).toList();
+                }
+
+                return FlutterMap(
+                  options: MapOptions(
+                    initialCenter: userLocation!,
+                    initialZoom: 3.0,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'de.othr.hooked',
+                      tileProvider: CancellableNetworkTileProvider(),
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        // User Location Marker
+                        Marker(
+                          point: userLocation!,
+                          width: 40,
+                          height: 40,
+                          rotate: true,
+                          child: const Icon(
+                            Icons.navigation,
+                            color: Color.fromARGB(255, 26, 152, 255),
+                            size: 40,
+                          ),
+                        ),
+                        // All Fishing Spot Markers
+                        ...fishingSpotsMarkers,
+                      ],
                     ),
                   ],
-                ),
-              ],
+                );
+              },
             ),
     );
   }
