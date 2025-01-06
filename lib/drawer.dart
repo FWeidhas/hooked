@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -24,7 +25,7 @@ class CustomDrawer extends StatelessWidget {
             title: const Text('Home'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
-              Navigator.pushNamed(context, '/');
+              Navigator.pushNamed(context, '/home');
             },
           ),
           ListTile(
@@ -49,6 +50,22 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context); // Close the drawer
               // Navigate to settings (add a route if needed)
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Logout'),
+            onTap: () async {
+              // Perform sign out
+              await FirebaseAuth.instance.signOut();
+
+              // Leere den Navigator-Stack und leite zur Login-Seite weiter
+              Navigator.pushNamedAndRemoveUntil(
+                context,
+                '/login', // Zielroute
+                (route) => false, // Alle vorherigen Routen entfernen
+              );
             },
           ),
         ],
