@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:hooked/components/themetoggle.dart';
 import 'package:hooked/openweather/weather_service.dart';
 import '../models/daily_weather.dart';
 import '../models/weather_forecast_widget.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class FishingSpotWeatherScreen extends StatefulWidget {
   final double latitude;
   final double longitude;
+  final String title;
 
   const FishingSpotWeatherScreen({
     Key? key,
+    required this.title,
     required this.latitude,
     required this.longitude,
   }) : super(key: key);
@@ -19,7 +23,7 @@ class FishingSpotWeatherScreen extends StatefulWidget {
 }
 
 class _FishingSpotWeatherScreenState extends State<FishingSpotWeatherScreen> {
-  final weatherService = WeatherService('d13f0ca33ea9987de6d871bed6b8b6d1');
+  final weatherService = WeatherService(dotenv.env['OPEN_WEATHER_API_KEY']!);
   Map<String, List<DailyWeather>>? forecast;
 
   @override
@@ -60,6 +64,7 @@ class _FishingSpotWeatherScreenState extends State<FishingSpotWeatherScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: _loadWeatherData,
           ),
+          ThemeToggleWidget(),
         ],
       ),
       body: SafeArea(
@@ -74,7 +79,10 @@ class _FishingSpotWeatherScreenState extends State<FishingSpotWeatherScreen> {
                   ],
                 ),
               )
-            : WeatherForecastWidget(forecast: forecast!),
+            : WeatherForecastWidget(
+                forecast: forecast!,
+                fishingSpotTitle: widget.title,
+              ),
       ),
     );
   }

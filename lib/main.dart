@@ -69,10 +69,16 @@ class MainApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
           '/map': (context) => const AuthGuard(child: FishingMap()),
-          '/fishing_spots': (context) => const AuthGuard(child: FishingSpots()),
-          '/weather': (context) => const AuthGuard(
-              child: FishingSpotWeatherScreen(
-                  latitude: 25.761681, longitude: -80.191788)),
+          '/fishing_spots': (context) => AuthGuard(child: FishingSpots()),
+          '/weather': (context) {
+            final args = ModalRoute.of(context)!.settings.arguments
+                as Map<String, dynamic>;
+            return FishingSpotWeatherScreen(
+              latitude: args['latitude'],
+              longitude: args['longitude'],
+              title: args['title'],
+            );
+          },
         },
       );
     });

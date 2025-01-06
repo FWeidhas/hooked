@@ -60,14 +60,6 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.location_on),
-            title: const Text('Weathery'),
-            onTap: () {
-              Navigator.pop(context); // Close the drawer
-              Navigator.pushNamed(context, '/weather');
-            },
-          ),
-          ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () {
