@@ -293,8 +293,7 @@ packages:
       sha256: "5398f14efa795ffb7a33e9b6a08798b26a180edac4ad7db3f231e40f82ce11e1"
       url: "https://pub.dev"
     source: hosted
-<<<<<<< HEAD
-    version: "4.0.0"
+    version: "5.0.0"
   flutter_map:
     dependency: "direct main"
     description:

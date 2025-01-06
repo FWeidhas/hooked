@@ -6,6 +6,7 @@ import 'package:hooked/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooked/pages/registration.dart';
 import 'firebase_options.dart';
+import 'models/user.dart';
 import 'util.dart';
 import 'theme.dart';
 import 'pages/home_page.dart';
@@ -64,17 +65,11 @@ class MainApp extends StatelessWidget {
           },
         ),
         routes: {
-<<<<<<< HEAD
-          '/': (context) => const HomePage(),
-          '/map': (context) => const FishingMap(),
-          '/fishing_spots': (context) => const FishingSpots(),
-=======
           '/home': (context) => const AuthGuard(child: HomePage()),
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
-          '/map': (context) => const AuthGuard(child: Map()),
+          '/map': (context) => const AuthGuard(child: FishingMap()),
           '/fishing_spots': (context) => const AuthGuard(child: FishingSpots()),
->>>>>>> 17995adb364359e6199c8d46575638daf3e5e850
         },
       );
     });
