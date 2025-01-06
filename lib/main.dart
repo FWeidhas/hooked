@@ -6,7 +6,6 @@ import 'package:hooked/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooked/pages/registration.dart';
 import 'firebase_options.dart';
-import 'models/user.dart';
 import 'util.dart';
 import 'theme.dart';
 import 'pages/home_page.dart';
