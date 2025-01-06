@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class ThemeController extends GetxController {
   // Use Rx<ThemeMode> to make the theme mode observable
-  Rx<ThemeMode> _themeMode = ThemeMode.light.obs;
+  final Rx<ThemeMode> _themeMode = ThemeMode.light.obs;
 
   ThemeMode get themeMode => _themeMode.value;
   set themeMode(ThemeMode mode) => _themeMode.value = mode;

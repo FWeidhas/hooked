@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({Key? key}) : super(key: key);
+  const CustomDrawer({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +33,14 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context); // Close the drawer
               Navigator.pushNamed(context, '/map');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.location_on),
+            title: const Text('Fishing Spots'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.pushNamed(context, '/fishing_spots');
             },
           ),
           ListTile(
