@@ -15,9 +15,24 @@ class CustomDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: primaryColor,
             ),
-            child: const Text(
-              'Drawer Header',
-              style: TextStyle(fontSize: 24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Text(
+                  'Drawer Header',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10), // Optionaler Abstand
+                Image.asset(
+                  'assets/hooked_icon-removebg-preview.png',
+                  height: 90, // Passe die Größe des Bildes an
+                  fit: BoxFit.contain,
+                ),
+              ],
             ),
           ),
           ListTile(
