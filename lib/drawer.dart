@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -49,6 +50,21 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context); // Close the drawer
               // Navigate to settings (add a route if needed)
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Logout'),
+            onTap: () async {
+              // Perform sign out
+              await FirebaseAuth.instance.signOut();
+
+              // Only navigate if the widget is still mounted
+              if (!context.mounted) return;
+
+              // Navigate to the login page after logout
+              Navigator.pushReplacementNamed(context, '/login');
             },
           ),
         ],
