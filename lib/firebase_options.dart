@@ -42,7 +42,7 @@ class DefaultFirebaseOptions {
   }
 
   static FirebaseOptions web = FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_WEB_API_KEY'] ?? '',
+    apiKey: dotenv.env['FIREBASE_WEB_API_KEY']!,
     appId: '1:102035129247:web:6059eeb84cd4b3bcddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
@@ -52,7 +52,7 @@ class DefaultFirebaseOptions {
   );
 
   static FirebaseOptions android = FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY'] ?? '',
+    apiKey: dotenv.env['FIREBASE_ANDROID_API_KEY']!,
     appId: '1:102035129247:android:90f2dabc83bfad85ddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
@@ -60,7 +60,7 @@ class DefaultFirebaseOptions {
   );
 
   static FirebaseOptions ios = FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_IOS_API_KEY'] ?? '',
+    apiKey: dotenv.env['FIREBASE_IOS_API_KEY']!,
     appId: '1:102035129247:ios:ea74e6be14b3723cddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
@@ -69,7 +69,7 @@ class DefaultFirebaseOptions {
   );
 
   static FirebaseOptions macos = FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_MACOS_API_KEY'] ?? '',
+    apiKey: dotenv.env['FIREBASE_MACOS_API_KEY']!,
     appId: '1:102035129247:ios:ea74e6be14b3723cddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
@@ -78,7 +78,7 @@ class DefaultFirebaseOptions {
   );
 
   static FirebaseOptions windows = FirebaseOptions(
-    apiKey: dotenv.env['FIREBASE_WINDOWS_API_KEY'] ?? '',
+    apiKey: dotenv.env['FIREBASE_WINDOWS_API_KEY']!,
     appId: '1:102035129247:web:793ae2ef5b2897b4ddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
