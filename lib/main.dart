@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hooked/auth_guard.dart';
+import 'package:hooked/pages/fishing_spot_weather_screen.dart';
 import 'package:hooked/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooked/pages/registration.dart';
@@ -69,6 +70,9 @@ class MainApp extends StatelessWidget {
           '/register': (context) => const RegistrationPage(),
           '/map': (context) => const AuthGuard(child: FishingMap()),
           '/fishing_spots': (context) => const AuthGuard(child: FishingSpots()),
+          '/weather': (context) => const AuthGuard(
+              child: FishingSpotWeatherScreen(
+                  latitude: 25.761681, longitude: -80.191788)),
         },
       );
     });
