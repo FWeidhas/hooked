@@ -10,9 +10,17 @@ import '../components/themetoggle.dart';
 import '../database/fishing_spot_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/database/fish_service.dart';
+import 'package:cloudinary_flutter/image/cld_image.dart';
+import 'package:cloudinary_flutter/cloudinary_object.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+late CloudinaryObject cloudinary;
 
 class FishingSpots extends StatelessWidget {
-  const FishingSpots({super.key});
+  FishingSpots({super.key}) {
+    cloudinary = CloudinaryObject.fromCloudName(
+        cloudName: dotenv.env['CLOUDINARY_CLOUD_NAME']!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +68,16 @@ class FishingSpots extends StatelessWidget {
               return Card(
                 margin: const EdgeInsets.all(10),
                 child: ListTile(
+                  leading: fishingSpot.picture != null
+                      ? SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CldImageWidget(
+                            cloudinary: cloudinary,
+                            publicId: fishingSpot.picture!,
+                          ),
+                        )
+                      : const Icon(Icons.image_not_supported),
                   title: Text(data['title'] ?? 'No title'),
                   subtitle: Text(data['description'] ?? 'No description'),
                   trailing: SizedBox(

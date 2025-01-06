@@ -5,20 +5,33 @@ import 'package:hooked/database/fishing_spot_service.dart';
 import 'package:hooked/database/fish_service.dart';
 import 'package:hooked/database/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hooked/cloudinary/cloudinary_service.dart';
 import 'package:hooked/models/user.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:cloudinary_flutter/cloudinary_object.dart';
+import 'package:cloudinary_flutter/image/cld_image.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+final cloudinaryService = CloudinaryService();
+final ImagePicker _picker = ImagePicker();
+late CloudinaryObject cloudinary;
 
 class EditFishingSpotPage extends StatefulWidget {
+  EditFishingSpotPage({
+    required this.docId,
+    required this.fishingSpot,
+    super.key,
+    this.fishes,
+    required this.user,
+  }) {
+    cloudinary = CloudinaryObject.fromCloudName(
+        cloudName: dotenv.env['CLOUDINARY_CLOUD_NAME']!);
+  }
+
   final String docId;
   final FishingSpot fishingSpot;
   final List<Fish>? fishes;
   final User user;
-
-  const EditFishingSpotPage(
-      {required this.docId,
-      required this.fishingSpot,
-      super.key,
-      this.fishes,
-      required this.user});
 
   @override
   State<EditFishingSpotPage> createState() => _EditFishingSpotPageState();
@@ -33,6 +46,24 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
   late TextEditingController _longitudeController;
   late TextEditingController _creatorController;
   late TextEditingController _fishesController;
+  String? _uploadedImageUrl;
+
+  Future<void> _selectAndUploadImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final imageUrl = await cloudinaryService.uploadImage(image.path);
+      if (imageUrl != null) {
+        setState(() {
+          _uploadedImageUrl = imageUrl;
+          _pictureController.text = imageUrl;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to upload image.')),
+        );
+      }
+    }
+  }
 
   @override
   void initState() {
@@ -90,7 +121,23 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                 TextFormField(
                   controller: _pictureController,
                   decoration: const InputDecoration(labelText: 'Picture URL'),
+                  readOnly: true,
                 ),
+                ElevatedButton(
+                  onPressed: _selectAndUploadImage,
+                  child: const Text('Select and Upload Image'),
+                ),
+                if (widget.fishingSpot.picture != null)
+                  SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: CldImageWidget(
+                      cloudinary: cloudinary,
+                      publicId: widget.fishingSpot.picture!,
+                      errorBuilder: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
+                  ),
                 TextFormField(
                   controller: _latitudeController,
                   decoration: const InputDecoration(labelText: 'Latitude'),
@@ -110,6 +157,27 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                   decoration: const InputDecoration(
                       labelText: 'Fishes (comma separated)'),
                 ),
+                if (widget.fishes != null && widget.fishes!.isNotEmpty)
+                  Column(
+                    children: widget.fishes!.map((fish) {
+                      return Column(
+                        children: [
+                          Text(fish.name ?? 'Unknown Fish'),
+                          if (fish.picture != null)
+                            SizedBox(
+                              width: 100,
+                              height: 100,
+                              child: CldImageWidget(
+                                cloudinary: cloudinary,
+                                publicId: fish.picture!,
+                                errorBuilder: (context, url, error) =>
+                                    const Icon(Icons.error),
+                              ),
+                            ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
@@ -169,7 +237,8 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                         id: widget.fishingSpot.id,
                         title: _titleController.text,
                         description: _descriptionController.text,
-                        picture: _pictureController.text,
+                        picture:
+                            _uploadedImageUrl ?? widget.fishingSpot.picture,
                         latitude: latitude,
                         longitude: longitude,
                         creator: userRef,
@@ -188,8 +257,4 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
       ),
     );
   }
-}
-
-extension on Future<User?> {
-  get email => null;
 }

@@ -6,9 +6,11 @@ import 'package:hooked/database/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/cloudinary/cloudinary_service.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:image_picker/image_picker.dart';
 
 final firestore = FirebaseFirestore.instance;
 final cloudinaryService = CloudinaryService();
+final ImagePicker _picker = ImagePicker();
 
 class AddFishingSpotPage extends StatefulWidget {
   const AddFishingSpotPage({super.key});
@@ -29,11 +31,9 @@ class _AddFishingSpotPageState extends State<AddFishingSpotPage> {
   String? _uploadedImageUrl;
 
   Future<void> _selectAndUploadImage() async {
-    FilePickerResult? result =
-        await FilePicker.platform.pickFiles(type: FileType.image);
-    if (result != null && result.files.single.path != null) {
-      final imageUrl =
-          await cloudinaryService.uploadImage(result.files.single.path!);
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      final imageUrl = await cloudinaryService.uploadImage(image.path);
       if (imageUrl != null) {
         setState(() {
           _uploadedImageUrl = imageUrl;
