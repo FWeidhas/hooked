@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter_dotenv/flutter_dotenv.dart' as dotenv;
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -40,8 +41,8 @@ class DefaultFirebaseOptions {
     }
   }
 
-  static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyCrqAJjaqVzcqAUzPD3hHMRLtwbG2PTl7Q',
+  static FirebaseOptions web = FirebaseOptions(
+    apiKey: dotenv.dotenv.env['FIREBASE_WEB_API_KEY'] ?? '',
     appId: '1:102035129247:web:6059eeb84cd4b3bcddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
@@ -50,16 +51,16 @@ class DefaultFirebaseOptions {
     measurementId: 'G-SMFCG5ZYYK',
   );
 
-  static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBywVINkVOdLsHWHklwuL1a1D16XANSGTE',
+  static FirebaseOptions android = FirebaseOptions(
+    apiKey: dotenv.dotenv.env['FIREBASE_ANDROID_API_KEY'] ?? '',
     appId: '1:102035129247:android:90f2dabc83bfad85ddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
     storageBucket: 'hooked-a21e9.firebasestorage.app',
   );
 
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBe-lboLh0KbrnJ2onsy_b2vNLeW4DTsoc',
+  static FirebaseOptions ios = FirebaseOptions(
+    apiKey: dotenv.dotenv.env['FIREBASE_IOS_API_KEY'] ?? '',
     appId: '1:102035129247:ios:ea74e6be14b3723cddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
@@ -67,8 +68,8 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.example.hooked',
   );
 
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBe-lboLh0KbrnJ2onsy_b2vNLeW4DTsoc',
+  static FirebaseOptions macos = FirebaseOptions(
+    apiKey: dotenv.dotenv.env['FIREBASE_MACOS_API_KEY'] ?? '',
     appId: '1:102035129247:ios:ea74e6be14b3723cddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
@@ -76,8 +77,8 @@ class DefaultFirebaseOptions {
     iosBundleId: 'com.example.hooked',
   );
 
-  static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyCrqAJjaqVzcqAUzPD3hHMRLtwbG2PTl7Q',
+  static FirebaseOptions windows = FirebaseOptions(
+    apiKey: dotenv.dotenv.env['FIREBASE_WINDOWS_API_KEY'] ?? '',
     appId: '1:102035129247:web:793ae2ef5b2897b4ddf3aa',
     messagingSenderId: '102035129247',
     projectId: 'hooked-a21e9',
