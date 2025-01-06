@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:hooked/models/fishingSpot.dart';
 import 'package:hooked/models/user.dart' as model;
 
 final CollectionReference userRef =
@@ -73,5 +74,25 @@ Future<bool> doesUserExist(String email) async {
   } catch (e) {
     print('Error checking user existence: $e');
     return false;
+  }
+}
+
+// Method to fetch the user for a fishing spot
+Future<model.User?> getUserForSpot(FishingSpot fishingSpot) async {
+  if (fishingSpot.creator == null) {
+    return null;
+  }
+
+  try {
+    DocumentSnapshot userDoc = await userRef.doc(fishingSpot.creator!.id).get();
+    if (userDoc.exists) {
+      return model.User.fromMap(
+          userDoc.data() as Map<String, dynamic>, userDoc.id);
+    } else {
+      return null;
+    }
+  } catch (e) {
+    print('Error fetching user document: $e');
+    return null;
   }
 }

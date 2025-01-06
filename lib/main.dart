@@ -68,7 +68,7 @@ class MainApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
           '/map': (context) => const AuthGuard(child: FishingMap()),
-          '/fishing_spots': (context) => const AuthGuard(child: FishingSpots()),
+          '/fishing_spots': (context) => FishingSpots(),
         },
       );
     });
