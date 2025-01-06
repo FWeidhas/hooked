@@ -13,7 +13,6 @@ import 'package:hooked/pages/fishing_spot_weather_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:cloudinary_flutter/image/cld_image.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final cloudinaryService = CloudinaryService();
 final ImagePicker _picker = ImagePicker();
