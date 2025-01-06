@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:hooked/pages/login.dart';
+import 'package:hooked/pages/registration.dart';
 import 'firebase_options.dart';
 import 'util.dart';
 import 'theme.dart';
@@ -46,9 +48,11 @@ class MainApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         themeMode:
             themeController.themeMode, // Bind theme mode to GetX controller
-        initialRoute: '/',
+        initialRoute: '/login',
         routes: {
           '/': (context) => const HomePage(),
+          '/login': (context) => const LoginPage(),
+          '/register': (context) => const RegistrationPage(),
           '/map': (context) => const Map(),
           '/fishing_spots': (context) => const FishingSpots(),
         },
