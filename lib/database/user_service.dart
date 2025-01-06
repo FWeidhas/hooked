@@ -96,23 +96,3 @@ Future<model.User?> getUserForSpot(FishingSpot fishingSpot) async {
     return null;
   }
 }
-
-// Method to fetch the user for a fishing spot
-Future<model.User?> getUserForSpot(FishingSpot fishingSpot) async {
-  if (fishingSpot.creator == null) {
-    return null;
-  }
-
-  try {
-    DocumentSnapshot userDoc = await userRef.doc(fishingSpot.creator!.id).get();
-    if (userDoc.exists) {
-      return model.User.fromMap(
-          userDoc.data() as Map<String, dynamic>, userDoc.id);
-    } else {
-      return null;
-    }
-  } catch (e) {
-    print('Error fetching user document: $e');
-    return null;
-  }
-}
