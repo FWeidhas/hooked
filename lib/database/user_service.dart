@@ -1,29 +1,77 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:hooked/models/user.dart';
+import 'package:hooked/models/user.dart' as model;
 
 final CollectionReference userRef =
     FirebaseFirestore.instance.collection('User');
 
 Future<DocumentReference?> getUserByEmail(String email) async {
-  QuerySnapshot querySnapshot =
-      await userRef.where('email', isEqualTo: email).get();
-  if (querySnapshot.docs.isNotEmpty) {
-    return querySnapshot.docs.first.reference;
-  }
-  return null;
-}
-
-Future<User?> getUser(String docId) async {
-  DocumentSnapshot doc = await userRef.doc(docId).get();
-  if (!doc.exists) {
+  try {
+    QuerySnapshot querySnapshot =
+        await userRef.where('email', isEqualTo: email).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first.reference;
+    }
+    return null;
+  } catch (e) {
+    print('Error fetching user by email: $e');
     return null;
   }
-  Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-  return User(
-    id: data['id'],
-    name: data['name'],
-    surname: data['surname'],
-    email: data['email'],
-    contacts: data['contacts'],
-  );
+}
+
+Future<model.User?> getUser(String docId) async {
+  try {
+    DocumentSnapshot doc = await userRef.doc(docId).get();
+    if (!doc.exists) {
+      return null;
+    }
+    Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    return model.User.fromMap(data, docId);
+  } catch (e) {
+    print('Error fetching user by ID: $e');
+    return null;
+  }
+}
+
+Future<bool> createUser(model.User user) async {
+  try {
+    await userRef.add(user.toMap());
+    print('User created successfully');
+    return true;
+  } catch (e) {
+    print('Error creating user: $e');
+    return false;
+  }
+}
+
+Future<bool> updateUser(String docId, Map<String, dynamic> updates) async {
+  try {
+    await userRef.doc(docId).update(updates);
+    print('User updated successfully');
+    return true;
+  } catch (e) {
+    print('Error updating user: $e');
+    return false;
+  }
+}
+
+Future<bool> deleteUser(String docId) async {
+  try {
+    await userRef.doc(docId).delete();
+    print('User deleted successfully');
+    return true;
+  } catch (e) {
+    print('Error deleting user: $e');
+    return false;
+  }
+}
+
+Future<bool> doesUserExist(String email) async {
+  try {
+    QuerySnapshot querySnapshot =
+        await userRef.where('email', isEqualTo: email).get();
+    return querySnapshot.docs.isNotEmpty;
+  } catch (e) {
+    print('Error checking user existence: $e');
+    return false;
+  }
 }
