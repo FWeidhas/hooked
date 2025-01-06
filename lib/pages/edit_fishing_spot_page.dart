@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hooked/models/fish.dart';
 import 'package:hooked/models/fishingSpot.dart';
 import 'package:hooked/database/fishing_spot_service.dart';
@@ -7,6 +8,7 @@ import 'package:hooked/database/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/cloudinary/cloudinary_service.dart';
 import 'package:hooked/models/user.dart';
+import 'package:hooked/pages/fishing_spot_weather_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:cloudinary_flutter/image/cld_image.dart';
@@ -138,6 +140,22 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                           const Icon(Icons.error),
                     ),
                   ),
+                // Check Weather button
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FishingSpotWeatherScreen(
+                          latitude: widget.fishingSpot.latitude!,
+                          longitude: widget.fishingSpot.longitude!,
+                          title: widget.fishingSpot.title!,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Check 7 Day Weather'),
+                ),
                 TextFormField(
                   controller: _latitudeController,
                   decoration: const InputDecoration(labelText: 'Latitude'),
