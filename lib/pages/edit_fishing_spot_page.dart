@@ -11,9 +11,14 @@ class EditFishingSpotPage extends StatefulWidget {
   final String docId;
   final FishingSpot fishingSpot;
   final List<Fish>? fishes;
+  final User user;
 
   const EditFishingSpotPage(
-      {required this.docId, required this.fishingSpot, super.key, this.fishes});
+      {required this.docId,
+      required this.fishingSpot,
+      super.key,
+      this.fishes,
+      required this.user});
 
   @override
   State<EditFishingSpotPage> createState() => _EditFishingSpotPageState();
@@ -41,9 +46,8 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
         TextEditingController(text: widget.fishingSpot.latitude?.toString());
     _longitudeController =
         TextEditingController(text: widget.fishingSpot.longitude?.toString());
-    print(widget.fishingSpot.creator?.path);
-    _creatorController =
-        TextEditingController(text: widget.fishingSpot.creator?.path);
+
+    _creatorController = TextEditingController(text: widget.user.email);
 
     _fishesController = TextEditingController(
       text: widget.fishes?.map((fish) => fish.name).join(', ') ?? '',
@@ -115,24 +119,59 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                           .toList();
                       List<DocumentReference> fishRefs = [];
 
+                      bool validFishs = true;
                       for (String fishName in fishNames) {
                         DocumentReference? fishRef =
                             await getFishByName(fishName);
-                        if (fishRef != null) {
+                        if (fishRef == null) {
+                          validFishs = false;
+                          break;
+                        } else {
                           fishRefs.add(fishRef);
                         }
                       }
 
+                      if (fishRefs.isEmpty || !validFishs) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Please enter valid fishs.')),
+                        );
+                        return;
+                      }
+
                       DocumentReference? userRef =
                           await getUserByEmail(_creatorController.text);
+
+                      if (userRef == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'Creator not found. Please enter a valid email.')),
+                        );
+                        return;
+                      }
+
+                      double? latitude =
+                          double.tryParse(_latitudeController.text);
+                      double? longitude =
+                          double.tryParse(_longitudeController.text);
+
+                      if (latitude == null || longitude == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'Please enter valid latitude and longitude.')),
+                        );
+                        return;
+                      }
 
                       FishingSpot updatedSpot = FishingSpot(
                         id: widget.fishingSpot.id,
                         title: _titleController.text,
                         description: _descriptionController.text,
                         picture: _pictureController.text,
-                        latitude: double.tryParse(_latitudeController.text),
-                        longitude: double.tryParse(_longitudeController.text),
+                        latitude: latitude,
+                        longitude: longitude,
                         creator: userRef,
                         fishes: fishRefs,
                       );

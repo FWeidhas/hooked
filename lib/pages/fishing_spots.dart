@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hooked/database/user_service.dart';
 import 'package:hooked/models/fish.dart';
 import 'package:hooked/models/fishingSpot.dart';
+import 'package:hooked/models/user.dart';
 import 'package:hooked/pages/add_fishing_spot_page.dart';
 import 'package:hooked/pages/edit_fishing_spot_page.dart';
 import '../drawer.dart';
@@ -69,13 +71,18 @@ class FishingSpots extends StatelessWidget {
                           onPressed: () async {
                             List<Fish> fishes =
                                 await getFishesForSpot(fishingSpot);
+                            User? user = await getUserForSpot(fishingSpot);
+                            if (user == null) {
+                              return;
+                            }
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => EditFishingSpotPage(
                                       docId: document.id,
                                       fishingSpot: fishingSpot,
-                                      fishes: fishes)),
+                                      fishes: fishes,
+                                      user: user)),
                             );
                           },
                         ),
