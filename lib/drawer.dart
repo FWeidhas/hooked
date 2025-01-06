@@ -52,6 +52,14 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.pets),
+            title: const Text('Fishes'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.pushNamed(context, '/fishes');
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.location_on),
             title: const Text('Fishing Spots'),
             onTap: () {

@@ -11,6 +11,7 @@ import 'theme.dart';
 import 'pages/home_page.dart';
 import 'pages/map.dart';
 import 'pages/fishing_spots.dart';
+import 'pages/fish.dart';
 import 'controller/themecontroller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -68,6 +69,7 @@ class MainApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
           '/map': (context) => const AuthGuard(child: FishingMap()),
+          '/fishes': (context) => FishPage(),
           '/fishing_spots': (context) => FishingSpots(),
         },
       );

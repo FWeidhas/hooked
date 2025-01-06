@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooked/models/fish.dart';
 import 'package:hooked/models/fishingSpot.dart';
@@ -6,7 +7,7 @@ import 'package:hooked/database/fish_service.dart';
 import 'package:hooked/database/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/cloudinary/cloudinary_service.dart';
-import 'package:hooked/models/user.dart';
+import 'package:hooked/models/user.dart' as models;
 import 'package:image_picker/image_picker.dart';
 import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:cloudinary_flutter/image/cld_image.dart';
@@ -15,6 +16,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 final cloudinaryService = CloudinaryService();
 final ImagePicker _picker = ImagePicker();
 late CloudinaryObject cloudinary;
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class EditFishingSpotPage extends StatefulWidget {
   EditFishingSpotPage({
@@ -31,7 +33,7 @@ class EditFishingSpotPage extends StatefulWidget {
   final String docId;
   final FishingSpot fishingSpot;
   final List<Fish>? fishes;
-  final User user;
+  final models.User user;
 
   @override
   State<EditFishingSpotPage> createState() => _EditFishingSpotPageState();
@@ -181,6 +183,16 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      // Check if the logged-in user's email matches the creator's email
+                      if (_auth.currentUser?.email != widget.user.email) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text(
+                                  'You do not have permission to edit this fishing spot.')),
+                        );
+                        return;
+                      }
+
                       List<String> fishNames = _fishesController.text
                           .split(',')
                           .map((e) => e.trim())
