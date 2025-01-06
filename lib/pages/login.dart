@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooked/components/themetoggle.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -47,64 +46,26 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Column(
-              children: [
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child:
-                          Icon(Icons.waves, size: 40, color: Colors.blueAccent),
-                    ),
-                    Align(
-                      alignment: Alignment.topCenter,
-                      child:
-                          Icon(Icons.waves, size: 40, color: Colors.blueAccent),
-                    ),
-                    Align(
-                      alignment: Alignment.bottomCenter,
-                      child:
-                          Icon(Icons.waves, size: 40, color: Colors.blueAccent),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                const Text(
-                  "Welcome to Hooked",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  "Your guide for the best fishing spots",
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+            // Bild oberhalb des Textes
+            Image.asset(
+              'assets/hooked_icon-removebg-preview.png',
+              height: 150,
             ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(FontAwesomeIcons.fish,
-                    size: 30,
-                    color: Theme.of(context).colorScheme.primaryContainer),
-                const SizedBox(width: 16),
-                Icon(FontAwesomeIcons.fish,
-                    size: 30,
-                    color: Theme.of(context).colorScheme.primaryContainer),
-                const SizedBox(width: 16),
-                Icon(FontAwesomeIcons.fish,
-                    size: 30,
-                    color: Theme.of(context).colorScheme.primaryContainer),
-              ],
+            const SizedBox(height: 16),
+            const Text(
+              "Welcome to Hooked",
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 8),
+            const Text(
+              "Your guide for the best fishing spots",
+              style: TextStyle(fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
             TextField(
               controller: _emailController,
               decoration: const InputDecoration(labelText: "Email"),
