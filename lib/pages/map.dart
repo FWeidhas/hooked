@@ -8,6 +8,8 @@ import '../drawer.dart';
 import '../components/themetoggle.dart';
 import 'package:hooked/models/fishingSpot.dart';
 import '../database/fishing_spot_service.dart';
+import '../models/fish.dart';
+import '../database/fish_service.dart';
 
 class FishingMap extends StatefulWidget {
   const FishingMap({super.key});
@@ -82,6 +84,79 @@ class _FishingMapState extends State<FishingMap> {
     });
   }
 
+  // void _showFishingSpotDetails(FishingSpot spot) {
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (BuildContext context) {
+  //       return DraggableScrollableSheet(
+  //         initialChildSize: 0.5, // 50% of screen height
+  //         minChildSize: 0.3, // 30% of screen height
+  //         maxChildSize: 0.8, // 80% of screen height
+  //         snap: true, // Enable snapping
+  //         snapSizes: const [0.3, 0.5, 0.8], // Define snap points
+  //         builder: (BuildContext context, ScrollController scrollController) {
+  //           return Container(
+  //             decoration: const BoxDecoration(
+  //               color: Colors.white,
+  //               borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //             ),
+  //             child: ListView(
+  //               controller: scrollController,
+  //               padding: const EdgeInsets.all(16),
+  //               children: [
+  //                 // Drag handle
+  //                 Center(
+  //                   child: Container(
+  //                     width: 40,
+  //                     height: 4,
+  //                     margin: const EdgeInsets.symmetric(vertical: 8),
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.grey[300],
+  //                       borderRadius: BorderRadius.circular(2),
+  //                     ),
+  //                   ),
+  //                 ),
+  //                 // Image section
+  //                 Container(
+  //                   height: 150,
+  //                   margin: const EdgeInsets.only(bottom: 16),
+  //                   alignment: Alignment.center,
+  //                   child: spot.picture != null
+  //                       ? Image.network(
+  //                           spot.picture!,
+  //                           fit: BoxFit.cover,
+  //                         )
+  //                       : const Icon(
+  //                           Icons.image_not_supported,
+  //                           size: 50,
+  //                           color: Colors.grey,
+  //                         ),
+  //                 ),
+  //                 // Title
+  //                 Text(
+  //                   spot.title ?? 'No Title',
+  //                   style: Theme.of(context)
+  //                       .textTheme
+  //                       .headlineMedium
+  //                       ?.copyWith(fontWeight: FontWeight.bold),
+  //                 ),
+  //                 const SizedBox(height: 8),
+  //                 // Description
+  //                 Text(
+  //                   spot.description ?? 'No Description',
+  //                   style: Theme.of(context).textTheme.bodyLarge,
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
+
   void _showFishingSpotDetails(FishingSpot spot) {
     showModalBottomSheet(
       context: context,
@@ -89,11 +164,11 @@ class _FishingMapState extends State<FishingMap> {
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return DraggableScrollableSheet(
-          initialChildSize: 0.5, // 50% of screen height
-          minChildSize: 0.3, // 30% of screen height
-          maxChildSize: 0.8, // 80% of screen height
-          snap: true, // Enable snapping
-          snapSizes: const [0.3, 0.5, 0.8], // Define snap points
+          initialChildSize: 0.5,
+          minChildSize: 0.3,
+          maxChildSize: 0.8,
+          snap: true,
+          snapSizes: const [0.3, 0.5, 0.8],
           builder: (BuildContext context, ScrollController scrollController) {
             return Container(
               decoration: const BoxDecoration(
@@ -145,6 +220,108 @@ class _FishingMapState extends State<FishingMap> {
                   Text(
                     spot.description ?? 'No Description',
                     style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  const SizedBox(height: 24),
+                  // Fish List Section
+                  Text(
+                    'Fish You Can Catch Here',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  // Fish List using service
+                  FutureBuilder<List<Fish>>(
+                    future: getFishesForSpot(spot),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Text(
+                              'Error loading fish data',
+                              style: TextStyle(color: Colors.red[400]),
+                            ),
+                          ),
+                        );
+                      }
+
+                      final fishes = snapshot.data ?? [];
+                      if (fishes.isEmpty) {
+                        return const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Text('No fish available at this spot'),
+                          ),
+                        );
+                      }
+
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: fishes.length,
+                        itemBuilder: (context, index) {
+                          final fish = fishes[index];
+                          return Card(
+                            elevation: 2,
+                            margin: const EdgeInsets.only(bottom: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(8),
+                              leading: Container(
+                                width: 60,
+                                height: 60,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: fish.picture != null
+                                    ? ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: Image.network(
+                                          fish.picture!,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return const Icon(
+                                              Icons.phishing,
+                                              size: 30,
+                                              color: Colors.grey,
+                                            );
+                                          },
+                                        ),
+                                      )
+                                    : const Icon(
+                                        Icons.phishing,
+                                        size: 30,
+                                        color: Colors.grey,
+                                      ),
+                              ),
+                              title: Text(
+                                fish.name ?? 'Unnamed Fish',
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               ),
