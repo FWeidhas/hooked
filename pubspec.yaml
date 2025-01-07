@@ -28,6 +28,7 @@ dependencies:
   flutter_map_cancellable_tile_provider: ^3.0.2
   file_picker: ^5.0.1
   image_picker: ^0.8.4+4
+  flutter_polyline_points: ^2.1.0
 
 dev_dependencies:
   flutter_test:

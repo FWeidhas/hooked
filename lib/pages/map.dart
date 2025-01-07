@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
 import 'package:hooked/controller/themecontroller.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../drawer.dart';
 import '../components/themetoggle.dart';
@@ -24,6 +27,7 @@ class _FishingMapState extends State<FishingMap> {
   LatLng? userLocation;
   List<Marker> fishingSpotsMarkers = [];
   List<FishingSpot> fishingSpots = [];
+  List<LatLng> routeCoordinates = [];
 
   @override
   void initState() {
@@ -159,6 +163,72 @@ class _FishingMapState extends State<FishingMap> {
   //   );
   // }
 
+  Future<void> _calculateRoute(FishingSpot spot) async {
+    if (userLocation == null) {
+      _showToast("User location not available.");
+      return;
+    }
+
+    final start = '${userLocation!.longitude},${userLocation!.latitude}';
+    final end = '${spot.longitude},${spot.latitude}';
+    final osrmUrl =
+        'https://router.project-osrm.org/route/v1/driving/$start;$end?overview=full';
+
+    try {
+      final response = await http.get(Uri.parse(osrmUrl));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final geometry = data['routes'][0]['geometry'];
+        // Decode polyline using flutter_polyline_points
+        final PolylinePoints polylinePoints = PolylinePoints();
+        final List<PointLatLng> decodedPoints =
+            polylinePoints.decodePolyline(geometry);
+        setState(() {
+          routeCoordinates = decodedPoints
+              .map((point) => LatLng(point.latitude, point.longitude))
+              .toList();
+        });
+      } else {
+        _showToast("Failed to fetch route. Try again.");
+      }
+    } catch (e) {
+      debugPrint("Error fetching route: $e");
+      _showToast("Error calculating route.");
+    }
+  }
+
+  List<LatLng> decodePolyline(String polyline) {
+    List<LatLng> points = [];
+    int index = 0, len = polyline.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int shift = 0, result = 0;
+      int b;
+      do {
+        b = polyline.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = polyline.codeUnitAt(index++) - 63;
+        result |= (b & 0x1F) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      points.add(LatLng(lat / 1E5, lng / 1E5));
+    }
+
+    return points;
+  }
+
   void _showFishingSpotDetails(FishingSpot spot) {
     showModalBottomSheet(
       context: context,
@@ -231,7 +301,7 @@ class _FishingMapState extends State<FishingMap> {
                   const SizedBox(height: 24),
                   // Fish List Section
                   Text(
-                    'Fish You Can Catch Here',
+                    'Fish you can catch here:',
                     style: Theme.of(context)
                         .textTheme
                         .titleLarge
@@ -330,6 +400,10 @@ class _FishingMapState extends State<FishingMap> {
                       );
                     },
                   ),
+                  ElevatedButton(
+                    onPressed: () => _calculateRoute(spot),
+                    child: const Text("Calculate Route"),
+                  ),
                 ],
               ),
             );
@@ -397,7 +471,7 @@ class _FishingMapState extends State<FishingMap> {
                 return FlutterMap(
                   options: MapOptions(
                     initialCenter: userLocation!,
-                    initialZoom: 3.0,
+                    initialZoom: 10.0,
                   ),
                   children: [
                     TileLayer(
@@ -424,6 +498,16 @@ class _FishingMapState extends State<FishingMap> {
                         ...fishingSpotsMarkers,
                       ],
                     ),
+                    if (routeCoordinates.isNotEmpty)
+                      PolylineLayer(
+                        polylines: [
+                          Polyline(
+                            points: routeCoordinates,
+                            strokeWidth: 4.0,
+                            color: Colors.blue,
+                          ),
+                        ],
+                      ),
                   ],
                 );
               },
