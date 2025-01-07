@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
+import 'package:get/get.dart';
+import 'package:hooked/controller/themecontroller.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -171,8 +173,8 @@ class _FishingMapState extends State<FishingMap> {
           snapSizes: const [0.3, 0.5, 0.8],
           builder: (BuildContext context, ScrollController scrollController) {
             return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondaryContainer,
                 borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
               ),
               child: ListView(
@@ -181,15 +183,20 @@ class _FishingMapState extends State<FishingMap> {
                 children: [
                   // Drag handle
                   Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      margin: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[300],
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
+                    child: Obx(() {
+                      final isDarkTheme =
+                          Get.find<ThemeController>().themeMode ==
+                              ThemeMode.dark;
+                      return Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isDarkTheme ? Colors.white : Colors.black,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      );
+                    }),
                   ),
                   // Image section
                   Container(
