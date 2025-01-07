@@ -352,6 +352,10 @@ class _FishingMapState extends State<FishingMap> {
           };
         }).toList();
 
+        // Create a controller to handle the bottom sheet state
+        final DraggableScrollableController _sheetController =
+            DraggableScrollableController();
+
         // Show the new bottom sheet with instructions
         showModalBottomSheet(
           context: context,
@@ -359,12 +363,24 @@ class _FishingMapState extends State<FishingMap> {
           backgroundColor: Colors.transparent,
           builder: (BuildContext context) {
             return DraggableScrollableSheet(
-              initialChildSize: 0.6,
-              minChildSize: 0.4,
-              maxChildSize: 0.9,
+              controller: _sheetController,
+              initialChildSize: 0.5,
+              minChildSize: 0.3,
+              maxChildSize: 0.8,
               snap: true,
+              snapSizes: const [0.3, 0.5, 0.8],
               builder:
                   (BuildContext context, ScrollController scrollController) {
+                // Listen for changes to the bottom sheet position
+                _sheetController.addListener(() {
+                  final extent = _sheetController.size;
+                  if (extent == 0.3) {
+                    setState(() {
+                      routeCoordinates = [];
+                    });
+                  }
+                });
+
                 return Container(
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.secondaryContainer,
