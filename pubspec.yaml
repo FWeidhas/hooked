@@ -39,5 +39,6 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/hooked_icon-removebg-preview.png
+    - assets/hooked_icon-removebg.png
+    - assets/hooked_icon.png
     - .env

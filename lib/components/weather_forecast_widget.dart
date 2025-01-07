@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
-import 'daily_weather.dart';
+import '../models/daily_weather.dart';
 import 'package:intl/intl.dart';
 
 class WeatherForecastWidget extends StatelessWidget {
   final Map<String, List<DailyWeather>> forecast;
   final String fishingSpotTitle;
-
+  // Constructor that requires forecast data and fishing spot title
   const WeatherForecastWidget({
-    Key? key,
+    super.key,
     required this.forecast,
     required this.fishingSpotTitle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Title section for the weather forecast
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: Text(
@@ -27,22 +28,27 @@ class WeatherForecastWidget extends StatelessWidget {
                 ),
           ),
         ),
+        // ListView to display the weather forecast for each day
         Expanded(
           child: ListView.builder(
             itemCount: forecast.length,
             itemBuilder: (context, index) {
+              // Extracting the date and daily weather details
               String date = forecast.keys.elementAt(index);
               List<DailyWeather> dailyForecasts = forecast[date]!;
 
+              // Creating a card for each day's forecast
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ExpansionTile(
+                  // Displaying the formatted date as the title
                   title: Text(
                     DateFormat('EEEE, MMMM d')
                         .format(dailyForecasts.first.date),
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   children: [
+                    // Displaying the weather data for each time slot (6AM, 12PM, 6PM)
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
@@ -62,6 +68,7 @@ class WeatherForecastWidget extends StatelessWidget {
     );
   }
 
+  // Helper function to create a time slot card for each forecasted time
   Widget _buildTimeSlot(DailyWeather weather) {
     return Expanded(
       child: Container(

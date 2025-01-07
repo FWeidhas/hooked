@@ -5,6 +5,7 @@ import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_ti
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:get/get.dart';
 import 'package:hooked/controller/themecontroller.dart';
+import 'package:hooked/pages/fishing_spot_weather_screen.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -301,6 +302,21 @@ class _FishingMapState extends State<FishingMap> {
                       _calculateRouteAndShowInstructions(spot);
                     },
                     child: const Text("Calculate Route"),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FishingSpotWeatherScreen(
+                            latitude: spot.latitude!,
+                            longitude: spot.longitude!,
+                            title: spot.title!,
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Check 7 Day Weather'),
                   ),
                 ],
               ),

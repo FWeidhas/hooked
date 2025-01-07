@@ -13,5 +13,6 @@ class ThemeController extends GetxController {
     _themeMode.value = (_themeMode.value == ThemeMode.light)
         ? ThemeMode.dark
         : ThemeMode.light;
+    print('New theme: $_themeMode'); // Debug-Ausgabe
   }
 }
