@@ -23,27 +23,34 @@ class FishingSpotWeatherScreen extends StatefulWidget {
 }
 
 class _FishingSpotWeatherScreenState extends State<FishingSpotWeatherScreen> {
+  // Instantiate the WeatherService with the API key from environment variables
   final weatherService = WeatherService(dotenv.env['OPEN_WEATHER_API_KEY']!);
+  // Variable to store the fetched weather forecast
   Map<String, List<DailyWeather>>? forecast;
 
   @override
   void initState() {
     super.initState();
+    // Load the weather data when the widget is initialized
     _loadWeatherData();
   }
 
+  // Function to fetch weather data from the weather service
   Future<void> _loadWeatherData() async {
     try {
+      // Fetch weather data using latitude and longitude from widget
       final weatherForecast = await weatherService.getWeatherForecast(
         widget.latitude,
         widget.longitude,
       );
+      // If widget is still mounted, update the forecast state with the fetched data
       if (mounted) {
         setState(() {
           forecast = weatherForecast;
         });
       }
     } catch (e) {
+      // If there is an error, show a snack bar with the error message
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading weather data: $e')),
@@ -60,6 +67,7 @@ class _FishingSpotWeatherScreenState extends State<FishingSpotWeatherScreen> {
         title: const Text('Weather Forecast'),
         backgroundColor: primaryColor,
         actions: [
+          // Button to manually refresh the weather data
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: _loadWeatherData,
@@ -80,8 +88,10 @@ class _FishingSpotWeatherScreenState extends State<FishingSpotWeatherScreen> {
                 ),
               )
             : WeatherForecastWidget(
+                // Pass the fetched weather forecast to the WeatherForecastWidget
                 forecast: forecast!,
-                fishingSpotTitle: widget.title,
+                fishingSpotTitle:
+                    widget.title, // Pass the title of the fishing spot
               ),
       ),
     );
