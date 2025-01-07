@@ -5,7 +5,6 @@ import 'package:hooked/database/fish_service.dart';
 import 'package:hooked/database/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/cloudinary/cloudinary_service.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 
 final firestore = FirebaseFirestore.instance;
