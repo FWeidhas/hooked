@@ -1,9 +1,41 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/models/fish.dart';
 import 'package:hooked/models/fishingSpot.dart';
+import 'package:hooked/database/fishing_spot_service.dart';
 
 final CollectionReference fishRef =
     FirebaseFirestore.instance.collection('Fish');
+
+Future<void> addFish(Fish fish) async {
+  try {
+    final docRef = await fishRef.add(fish.toMap());
+    // Optionally update the id of the Fish object with the Firestore document ID
+    fish.id = docRef.id;
+  } catch (e) {
+    print('Error adding fishing spot: $e');
+    throw e;
+  }
+}
+
+// Get all fishing spots
+Stream<QuerySnapshot> getAllFishes() {
+  return fishRef.snapshots();
+}
+
+// Update fishing spot
+Future<void> updateFish(String docId, Fish fish) async {
+  await fishRef.doc(docId).update(fish.toMap());
+}
+
+// Delete fishing spot
+Future<void> deleteFish(String docId) async {
+  bool hasReferences = await hasFishingSpotsWithFish(docId);
+  if (hasReferences) {
+    throw Exception(
+        'Cannot delete fish. It is referenced by one or more fishing spots.');
+  }
+  await fishRef.doc(docId).delete();
+}
 
 Future<DocumentReference?> getFishByName(String name) async {
   QuerySnapshot querySnapshot =

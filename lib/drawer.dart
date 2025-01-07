@@ -26,10 +26,10 @@ class CustomDrawer extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(height: 10), // Optionaler Abstand
+                const SizedBox(height: 10),
                 Image.asset(
                   'assets/hooked_icon-removebg-preview.png',
-                  height: 90, // Passe die Größe des Bildes an
+                  height: 90,
                   fit: BoxFit.contain,
                 ),
               ],
@@ -49,6 +49,14 @@ class CustomDrawer extends StatelessWidget {
             onTap: () {
               Navigator.pop(context); // Close the drawer
               Navigator.pushNamed(context, '/map');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.pets),
+            title: const Text('Fishes'),
+            onTap: () {
+              Navigator.pop(context); // Close the drawer
+              Navigator.pushNamed(context, '/fishes');
             },
           ),
           ListTile(
@@ -74,12 +82,10 @@ class CustomDrawer extends StatelessWidget {
             onTap: () async {
               // Perform sign out
               await FirebaseAuth.instance.signOut();
-
-              // Leere den Navigator-Stack und leite zur Login-Seite weiter
               Navigator.pushNamedAndRemoveUntil(
                 context,
-                '/login', // Zielroute
-                (route) => false, // Alle vorherigen Routen entfernen
+                '/login',
+                (route) => false,
               );
             },
           ),

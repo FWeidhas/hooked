@@ -1,23 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:hooked/database/user_service.dart';
 import 'package:hooked/models/fish.dart';
-import 'package:hooked/models/fishingSpot.dart';
-import 'package:hooked/models/user.dart';
-import 'package:hooked/pages/add_fishing_spot_page.dart';
-import 'package:hooked/pages/edit_fishing_spot_page.dart';
+import 'package:hooked/pages/add_fish_page.dart';
+import 'package:hooked/pages/edit_fish_page.dart';
 import '../drawer.dart';
 import '../components/themetoggle.dart';
-import '../database/fishing_spot_service.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/database/fish_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloudinary_flutter/image/cld_image.dart';
 import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 late CloudinaryObject cloudinary;
 
-class FishingSpots extends StatelessWidget {
-  FishingSpots({super.key}) {
+class FishPage extends StatelessWidget {
+  FishPage({super.key}) {
     cloudinary = CloudinaryObject.fromCloudName(
         cloudName: dotenv.env['CLOUDINARY_CLOUD_NAME']!);
   }
@@ -28,7 +24,7 @@ class FishingSpots extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fishing Spots'),
+        title: const Text('Fish'),
         backgroundColor: primaryColor,
         actions: const [
           ThemeToggleWidget(),
@@ -40,14 +36,14 @@ class FishingSpots extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddFishingSpotPage(),
+              builder: (context) => const AddFishPage(),
             ),
           );
         },
         child: const Icon(Icons.add),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: getAllFishingSpots(),
+        stream: getAllFishes(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Text('Something went wrong');
@@ -63,51 +59,52 @@ class FishingSpots extends StatelessWidget {
               DocumentSnapshot document = snapshot.data!.docs[index];
               Map<String, dynamic> data =
                   document.data() as Map<String, dynamic>;
-              FishingSpot fishingSpot = FishingSpot.fromMap(data, document.id);
+              Fish fish = Fish.fromMap(data, document.id);
 
               return Card(
                 margin: const EdgeInsets.all(10),
                 child: ListTile(
-                  leading: fishingSpot.picture != null
+                  leading: fish.picture != null
                       ? SizedBox(
                           width: 50,
                           height: 50,
                           child: CldImageWidget(
                             cloudinary: cloudinary,
-                            publicId: fishingSpot.picture!,
+                            publicId: fish.picture!,
                           ),
                         )
                       : const Icon(Icons.image_not_supported),
-                  title: Text(data['title'] ?? 'No title'),
-                  subtitle: Text(data['description'] ?? 'No description'),
+                  title: Text(data['name'] ?? 'No name'),
                   trailing: SizedBox(
                     width: 100,
                     child: Row(
                       children: [
                         IconButton(
                           icon: const Icon(Icons.edit),
-                          onPressed: () async {
-                            List<Fish> fishes =
-                                await getFishesForSpot(fishingSpot);
-                            User? user = await getUserForSpot(fishingSpot);
-                            if (user == null) {
-                              return;
-                            }
+                          onPressed: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => EditFishingSpotPage(
-                                      docId: document.id,
-                                      fishingSpot: fishingSpot,
-                                      fishes: fishes,
-                                      user: user)),
+                                  builder: (context) => EditFishPage(
+                                      docId: document.id, fish: fish)),
                             );
                           },
                         ),
                         IconButton(
                           icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            deleteFishingSpot(document.id);
+                          onPressed: () async {
+                            try {
+                              await deleteFish(document.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Fish deleted successfully.')),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(e.toString())),
+                              );
+                            }
                           },
                         ),
                       ],

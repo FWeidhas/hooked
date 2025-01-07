@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hooked/auth_guard.dart';
+import 'package:hooked/pages/fishing_spot_weather_screen.dart';
 import 'package:hooked/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooked/pages/registration.dart';
@@ -11,6 +12,7 @@ import 'theme.dart';
 import 'pages/home_page.dart';
 import 'pages/map.dart';
 import 'pages/fishing_spots.dart';
+import 'pages/fish.dart';
 import 'controller/themecontroller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -68,7 +70,17 @@ class MainApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
           '/map': (context) => const AuthGuard(child: FishingMap()),
-          '/fishing_spots': (context) => const AuthGuard(child: FishingSpots()),
+          '/fishes': (context) => FishPage(),
+          '/fishing_spots': (context) => AuthGuard(child: FishingSpots()),
+          '/weather': (context) {
+            final args = ModalRoute.of(context)!.settings.arguments
+                as Map<String, dynamic>;
+            return FishingSpotWeatherScreen(
+              latitude: args['latitude'],
+              longitude: args['longitude'],
+              title: args['title'],
+            );
+          },
         },
       );
     });

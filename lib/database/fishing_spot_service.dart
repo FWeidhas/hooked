@@ -49,3 +49,10 @@ Future<FishingSpot?> getFishingSpot(String docId) async {
     fishes: data['fishes'],
   );
 }
+
+// Check if any fishing spots refer to a specific fish
+Future<bool> hasFishingSpotsWithFish(String fishId) async {
+  QuerySnapshot querySnapshot =
+      await fishingSpotRef.where('fishes', arrayContains: fishId).get();
+  return querySnapshot.docs.isNotEmpty;
+}
