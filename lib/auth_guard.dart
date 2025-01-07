@@ -5,7 +5,7 @@ import 'package:hooked/pages/login.dart';
 class AuthGuard extends StatelessWidget {
   final Widget child;
 
-  const AuthGuard({Key? key, required this.child}) : super(key: key);
+  const AuthGuard({super.key, required this.child});
 
   @override
   Widget build(BuildContext context) {

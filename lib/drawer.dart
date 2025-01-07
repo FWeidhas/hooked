@@ -28,7 +28,7 @@ class CustomDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Image.asset(
-                  'assets/hooked_icon-removebg-preview.png',
+                  'assets/hooked_icon-removebg.png',
                   height: 90,
                   fit: BoxFit.contain,
                 ),
@@ -36,27 +36,11 @@ class CustomDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
-            leading: const Icon(Icons.home),
-            title: const Text('Home'),
-            onTap: () {
-              Navigator.pop(context); // Close the drawer
-              Navigator.pushNamed(context, '/home');
-            },
-          ),
-          ListTile(
             leading: const Icon(Icons.map),
             title: const Text('Map'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
               Navigator.pushNamed(context, '/map');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.pets),
-            title: const Text('Fishes'),
-            onTap: () {
-              Navigator.pop(context); // Close the drawer
-              Navigator.pushNamed(context, '/fishes');
             },
           ),
           ListTile(
@@ -68,11 +52,11 @@ class CustomDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            leading: const Icon(Icons.pets),
+            title: const Text('Fishes'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
-              // Navigate to settings (add a route if needed)
+              Navigator.pushNamed(context, '/fishes');
             },
           ),
           const Divider(),

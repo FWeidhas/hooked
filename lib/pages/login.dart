@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooked/components/themetoggle.dart';
+import 'package:get/get.dart';
+import '../controller/themecontroller.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -14,13 +16,16 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  // ThemeController über GetX initialisieren
+  final ThemeController themeController = Get.put(ThemeController());
+
   Future<void> _login() async {
     try {
       await _auth.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacementNamed(context, '/fishing_spots');
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Login failed: $e')),
@@ -46,11 +51,20 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Bild oberhalb des Textes
-            Image.asset(
-              'assets/hooked_icon-removebg-preview.png',
-              height: 150,
-            ),
+            Obx(() {
+              return ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(8), // Adjust the value for roundness
+                child: Image.asset(
+                  themeController.themeMode == ThemeMode.dark
+                      ? 'assets/hooked_icon.png'
+                      : 'assets/hooked_icon-removebg.png',
+                  height: 150,
+                  width: 150,
+                  fit: BoxFit.cover, // Ensures the image scales properly
+                ),
+              );
+            }),
             const SizedBox(height: 16),
             const Text(
               "Welcome to Hooked",
@@ -70,6 +84,7 @@ class _LoginPageState extends State<LoginPage> {
               controller: _emailController,
               decoration: const InputDecoration(labelText: "Email"),
               keyboardType: TextInputType.emailAddress,
+              textInputAction: TextInputAction.next,
             ),
             TextField(
               controller: _passwordController,

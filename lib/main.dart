@@ -9,7 +9,6 @@ import 'package:hooked/pages/registration.dart';
 import 'firebase_options.dart';
 import 'util.dart';
 import 'theme.dart';
-import 'pages/home_page.dart';
 import 'pages/map.dart';
 import 'pages/fishing_spots.dart';
 import 'pages/fish.dart';
@@ -59,19 +58,18 @@ class MainApp extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasData) {
-              return const HomePage();
+              return FishingSpots();
             } else {
               return const LoginPage();
             }
           },
         ),
         routes: {
-          '/home': (context) => const AuthGuard(child: HomePage()),
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegistrationPage(),
           '/map': (context) => const AuthGuard(child: FishingMap()),
-          '/fishes': (context) => FishPage(),
           '/fishing_spots': (context) => AuthGuard(child: FishingSpots()),
+          '/fishes': (context) => FishPage(),
           '/weather': (context) {
             final args = ModalRoute.of(context)!.settings.arguments
                 as Map<String, dynamic>;

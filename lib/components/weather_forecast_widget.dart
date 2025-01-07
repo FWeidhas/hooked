@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'daily_weather.dart';
+import '../models/daily_weather.dart';
 import 'package:intl/intl.dart';
 
 class WeatherForecastWidget extends StatelessWidget {
@@ -7,10 +7,10 @@ class WeatherForecastWidget extends StatelessWidget {
   final String fishingSpotTitle;
 
   const WeatherForecastWidget({
-    Key? key,
+    super.key,
     required this.forecast,
     required this.fishingSpotTitle,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

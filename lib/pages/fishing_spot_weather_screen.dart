@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hooked/components/themetoggle.dart';
 import 'package:hooked/openweather/weather_service.dart';
 import '../models/daily_weather.dart';
-import '../models/weather_forecast_widget.dart';
+import '../components/weather_forecast_widget.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class FishingSpotWeatherScreen extends StatefulWidget {
