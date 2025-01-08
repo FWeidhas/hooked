@@ -48,9 +48,11 @@ class _AddFishingSpotPageState extends State<AddFishingSpotPage> {
 
   @override
   Widget build(BuildContext context) {
+    Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Fishing Spot'),
+        backgroundColor: primaryColor,
       ),
       body: Form(
         key: _formKey,
@@ -84,10 +86,19 @@ class _AddFishingSpotPageState extends State<AddFishingSpotPage> {
                   decoration: const InputDecoration(labelText: 'Picture URL'),
                   readOnly: true,
                 ),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _selectAndUploadImage,
-                  child: const Text('Select and Upload Image'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.tertiaryContainer,
+                  ),
+                  child: Text(
+                    'Select and Upload Image',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _latitudeController,
                   decoration: const InputDecoration(labelText: 'Latitude'),
@@ -108,6 +119,7 @@ class _AddFishingSpotPageState extends State<AddFishingSpotPage> {
                   decoration: const InputDecoration(
                       labelText: 'Fishes (comma separated)'),
                 ),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
@@ -176,7 +188,14 @@ class _AddFishingSpotPageState extends State<AddFishingSpotPage> {
                       Navigator.pop(context);
                     }
                   },
-                  child: const Text('Save'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: Text(
+                    'Save',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ),
               ],
             ),

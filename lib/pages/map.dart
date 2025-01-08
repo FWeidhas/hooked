@@ -301,8 +301,16 @@ class _FishingMapState extends State<FishingMap> {
                       Navigator.pop(context);
                       _calculateRouteAndShowInstructions(spot);
                     },
-                    child: const Text("Calculate Route"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer,
+                    ),
+                    child: Text(
+                      "Calculate Route",
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                   ),
+                  const SizedBox(height: 8),
                   ElevatedButton(
                     onPressed: () {
                       Navigator.push(
@@ -316,7 +324,14 @@ class _FishingMapState extends State<FishingMap> {
                         ),
                       );
                     },
-                    child: const Text('Check 7 Day Weather'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.tertiaryContainer,
+                    ),
+                    child: Text(
+                      'Check 7 Day Weather',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                   ),
                 ],
               ),
@@ -468,14 +483,20 @@ class _FishingMapState extends State<FishingMap> {
                         );
                       }),
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          setState(() {
-                            routeCoordinates = [];
-                          });
-                        },
-                        child: const Text("Cancel route"),
-                      ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                            setState(() {
+                              routeCoordinates = [];
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.errorContainer,
+                          ),
+                          child: Text(
+                            "Cancel route",
+                            style: Theme.of(context).textTheme.labelMedium,
+                          )),
                     ],
                   ),
                 );
