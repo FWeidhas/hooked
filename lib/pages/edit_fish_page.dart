@@ -60,9 +60,11 @@ class _EditFishPageState extends State<EditFishPage> {
 
   @override
   Widget build(BuildContext context) {
+    Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Edit Fish'),
+        backgroundColor: primaryColor,
       ),
       body: Form(
         key: _formKey,
@@ -86,10 +88,19 @@ class _EditFishPageState extends State<EditFishPage> {
                   decoration: const InputDecoration(labelText: 'Picture URL'),
                   readOnly: true,
                 ),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _selectAndUploadImage,
-                  child: const Text('Select and Upload Image'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.tertiaryContainer,
+                  ),
+                  child: Text(
+                    'Select and Upload Image',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ),
+                const SizedBox(height: 16),
                 if (widget.fish.picture != null)
                   SizedBox(
                     width: 100,
@@ -101,6 +112,7 @@ class _EditFishPageState extends State<EditFishPage> {
                           const Icon(Icons.error),
                     ),
                   ),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
@@ -113,7 +125,14 @@ class _EditFishPageState extends State<EditFishPage> {
                       Navigator.pop(context);
                     }
                   },
-                  child: const Text('Save'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: Text(
+                    'Save',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ),
               ],
             ),

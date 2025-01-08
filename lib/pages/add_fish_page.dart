@@ -39,9 +39,11 @@ class _AddFishPageState extends State<AddFishPage> {
 
   @override
   Widget build(BuildContext context) {
+    Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Fish'),
+        backgroundColor: primaryColor,
       ),
       body: Form(
         key: _formKey,
@@ -65,10 +67,19 @@ class _AddFishPageState extends State<AddFishPage> {
                   decoration: const InputDecoration(labelText: 'Picture URL'),
                   readOnly: true,
                 ),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _selectAndUploadImage,
-                  child: const Text('Select and Upload Image'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.tertiaryContainer,
+                  ),
+                  child: Text(
+                    'Select and Upload Image',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ),
+                const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
@@ -80,7 +91,14 @@ class _AddFishPageState extends State<AddFishPage> {
                       Navigator.pop(context);
                     }
                   },
-                  child: const Text('Save'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                  ),
+                  child: Text(
+                    'Save',
+                    style: Theme.of(context).textTheme.labelMedium,
+                  ),
                 ),
               ],
             ),
