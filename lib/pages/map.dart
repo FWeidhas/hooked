@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
@@ -29,6 +30,9 @@ class _FishingMapState extends State<FishingMap> {
   List<Marker> fishingSpotsMarkers = [];
   List<FishingSpot> fishingSpots = [];
   List<LatLng> routeCoordinates = [];
+  List<Map<String, dynamic>> currentRouteInstructions = [];
+
+  final MapController mapController = MapController();
 
   @override
   void initState() {
@@ -89,40 +93,6 @@ class _FishingMapState extends State<FishingMap> {
     setState(() {
       userLocation = const LatLng(49.013432, 12.101624); // Fallback location
     });
-  }
-
-  Future<void> _calculateRoute(FishingSpot spot) async {
-    if (userLocation == null) {
-      _showToast("User location not available.");
-      return;
-    }
-
-    final start = '${userLocation!.longitude},${userLocation!.latitude}';
-    final end = '${spot.longitude},${spot.latitude}';
-    final osrmUrl =
-        'https://router.project-osrm.org/route/v1/driving/$start;$end?overview=full';
-
-    try {
-      final response = await http.get(Uri.parse(osrmUrl));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        final geometry = data['routes'][0]['geometry'];
-        // Decode polyline using flutter_polyline_points
-        final PolylinePoints polylinePoints = PolylinePoints();
-        final List<PointLatLng> decodedPoints =
-            polylinePoints.decodePolyline(geometry);
-        setState(() {
-          routeCoordinates = decodedPoints
-              .map((point) => LatLng(point.latitude, point.longitude))
-              .toList();
-        });
-      } else {
-        _showToast("Failed to fetch route. Try again.");
-      }
-    } catch (e) {
-      debugPrint("Error fetching route: $e");
-      _showToast("Error calculating route.");
-    }
   }
 
   void _showFishingSpotDetails(FishingSpot spot) {
@@ -364,146 +334,66 @@ class _FishingMapState extends State<FishingMap> {
         final PolylinePoints polylinePoints = PolylinePoints();
         final List<PointLatLng> decodedPoints =
             polylinePoints.decodePolyline(geometry);
+
+        // Store route and instructions in state
         setState(() {
           routeCoordinates = decodedPoints
               .map((point) => LatLng(point.latitude, point.longitude))
               .toList();
+
+          currentRouteInstructions = steps.map((step) {
+            final distance = step['distance'];
+            final roadName = step['name'] ?? "";
+            final instruction = step['maneuver']['modifier'] ?? "";
+
+            return {
+              'instruction': instruction,
+              'distance': distance,
+              'road_name': roadName,
+            };
+          }).toList();
         });
 
-        // Extract instructions from the steps
-        final instructions = steps.map((step) {
-          final distance = step['distance'];
-          final roadName = step['name'] ?? "";
-          final instruction = step['maneuver']['modifier'] ?? "";
+        await Future.delayed(const Duration(milliseconds: 100));
 
-          return {
-            'instruction': instruction,
-            'distance': distance,
-            'road_name': roadName,
-          };
-        }).toList();
+        // Find the bounds of the route
+        if (routeCoordinates.isNotEmpty) {
+          double minLat = routeCoordinates.first.latitude;
+          double maxLat = routeCoordinates.first.latitude;
+          double minLng = routeCoordinates.first.longitude;
+          double maxLng = routeCoordinates.first.longitude;
 
-        // Create a controller to handle the bottom sheet state
-        final DraggableScrollableController _sheetController =
-            DraggableScrollableController();
+          for (var point in routeCoordinates) {
+            minLat = min(minLat, point.latitude);
+            maxLat = max(maxLat, point.latitude);
+            minLng = min(minLng, point.longitude);
+            maxLng = max(maxLng, point.longitude);
+          }
 
-        // Show the new bottom sheet with instructions
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: Colors.transparent,
-          builder: (BuildContext context) {
-            return DraggableScrollableSheet(
-              controller: _sheetController,
-              initialChildSize: 0.5,
-              minChildSize: 0.3,
-              maxChildSize: 0.8,
-              snap: true,
-              snapSizes: const [0.3, 0.5, 0.8],
-              builder:
-                  (BuildContext context, ScrollController scrollController) {
-                // Listen for changes to the bottom sheet position
-                _sheetController.addListener(() {
-                  final extent = _sheetController.size;
-                  if (extent == 0.3) {
-                    setState(() {
-                      routeCoordinates = [];
-                    });
-                  }
-                });
+          // Add padding (10%)
+          final latPadding = (maxLat - minLat) * 0.1;
+          final lngPadding = (maxLng - minLng) * 0.1;
 
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
-                    borderRadius:
-                        const BorderRadius.vertical(top: Radius.circular(20)),
-                  ),
-                  child: ListView(
-                    controller: scrollController,
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      // Drag handle
-                      Center(
-                        child: Obx(() {
-                          final isDarkTheme =
-                              Get.find<ThemeController>().themeMode ==
-                                  ThemeMode.dark;
-                          return Container(
-                            width: 40,
-                            height: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            decoration: BoxDecoration(
-                              color: isDarkTheme ? Colors.white : Colors.black,
-                              borderRadius: BorderRadius.circular(2),
-                            ),
-                          );
-                        }),
-                      ),
-                      // Title
-                      Text(
-                        "Route Instructions",
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-                      // Display the route instructions with icons
-                      ...instructions.map((step) {
-                        // Determine the icon based on the instruction
-                        IconData icon;
-                        switch (step['instruction']) {
-                          case 'right':
-                            icon = Icons.turn_right_outlined;
-                            break;
-                          case 'left':
-                            icon = Icons.turn_left_outlined;
-                            break;
-                          case 'straight':
-                          default:
-                            icon = Icons.straight_outlined;
-                            break;
-                        }
-                        // Format distance for meters/kilometers
-                        String formattedDistance;
-                        if (step['distance'] > 1000) {
-                          formattedDistance =
-                              "${(step['distance'] / 1000).toStringAsFixed(1)} km";
-                        } else {
-                          formattedDistance =
-                              "${step['distance'].toStringAsFixed(0)} m";
-                        }
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          child: ListTile(
-                            leading: Icon(icon),
-                            title: Text("Distance: $formattedDistance"),
-                            subtitle: Text(step['road_name']),
-                          ),
-                        );
-                      }),
-                      ElevatedButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                            setState(() {
-                              routeCoordinates = [];
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                Theme.of(context).colorScheme.errorContainer,
-                          ),
-                          child: Text(
-                            "Cancel route",
-                            style: Theme.of(context).textTheme.labelMedium,
-                          )),
-                    ],
-                  ),
-                );
-              },
-            );
-          },
-        );
+          // Calculate center point
+          final centerLat = (minLat + maxLat) / 2;
+          final centerLng = (minLng + maxLng) / 2;
+
+          // Calculate height and width in degrees
+          final heightDegrees = (maxLat - minLat) + (2 * latPadding);
+          final widthDegrees = (maxLng - minLng) + (2 * lngPadding);
+
+          // Calculate zoom level
+          final latZoom = log(170 / heightDegrees) / log(2);
+          final lngZoom = log(360 / widthDegrees) / log(2);
+          final zoom = min(latZoom, lngZoom);
+
+          mapController.move(
+            LatLng(centerLat, centerLng),
+            min(zoom, 15), // Limit maximum zoom to 15
+          );
+        }
+
+        _showRouteInstructions();
       } else {
         _showToast("Failed to fetch route instructions.");
       }
@@ -511,6 +401,118 @@ class _FishingMapState extends State<FishingMap> {
       debugPrint("Error fetching route: $e");
       _showToast("Error calculating route.");
     }
+  }
+
+  // Add new method to show instructions
+  void _showRouteInstructions() {
+    final DraggableScrollableController _sheetController =
+        DraggableScrollableController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return DraggableScrollableSheet(
+          controller: _sheetController,
+          initialChildSize: 0.5,
+          minChildSize: 0.3,
+          maxChildSize: 0.8,
+          snap: true,
+          snapSizes: const [0.3, 0.5, 0.8],
+          builder: (BuildContext context, ScrollController scrollController) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              child: ListView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(16),
+                children: [
+                  // Drag handle
+                  Center(
+                    child: Obx(() {
+                      final isDarkTheme =
+                          Get.find<ThemeController>().themeMode ==
+                              ThemeMode.dark;
+                      return Container(
+                        width: 40,
+                        height: 4,
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isDarkTheme ? Colors.white : Colors.black,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      );
+                    }),
+                  ),
+                  // Title
+                  Text(
+                    "Route Instructions",
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineSmall
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 16),
+                  // Display the route instructions with icons
+                  ...currentRouteInstructions.map((step) {
+                    IconData icon;
+                    switch (step['instruction']) {
+                      case 'right':
+                        icon = Icons.turn_right_outlined;
+                        break;
+                      case 'left':
+                        icon = Icons.turn_left_outlined;
+                        break;
+                      case 'straight':
+                      default:
+                        icon = Icons.straight_outlined;
+                        break;
+                    }
+                    String formattedDistance;
+                    if (step['distance'] > 1000) {
+                      formattedDistance =
+                          "${(step['distance'] / 1000).toStringAsFixed(1)} km";
+                    } else {
+                      formattedDistance =
+                          "${step['distance'].toStringAsFixed(0)} m";
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8),
+                      child: ListTile(
+                        leading: Icon(icon),
+                        title: Text("Distance: $formattedDistance"),
+                        subtitle: Text(step['road_name']),
+                      ),
+                    );
+                  }),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      setState(() {
+                        routeCoordinates = [];
+                        currentRouteInstructions = [];
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.errorContainer,
+                    ),
+                    child: Text(
+                      "Cancel route",
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -526,6 +528,13 @@ class _FishingMapState extends State<FishingMap> {
         ],
       ),
       drawer: const CustomDrawer(),
+      floatingActionButton: routeCoordinates.isNotEmpty
+          ? FloatingActionButton(
+              onPressed: _showRouteInstructions,
+              backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+              child: const Icon(Icons.navigation),
+            )
+          : null,
       body: userLocation == null
           ? const Center(child: CircularProgressIndicator())
           : StreamBuilder<QuerySnapshot>(
@@ -569,6 +578,7 @@ class _FishingMapState extends State<FishingMap> {
                 }
 
                 return FlutterMap(
+                  mapController: mapController,
                   options: MapOptions(
                     initialCenter: userLocation!,
                     initialZoom: 10.0,
