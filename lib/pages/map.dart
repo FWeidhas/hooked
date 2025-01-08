@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
@@ -355,6 +356,43 @@ class _FishingMapState extends State<FishingMap> {
 
         await Future.delayed(const Duration(milliseconds: 100));
 
+        // Find the bounds of the route
+        if (routeCoordinates.isNotEmpty) {
+          double minLat = routeCoordinates.first.latitude;
+          double maxLat = routeCoordinates.first.latitude;
+          double minLng = routeCoordinates.first.longitude;
+          double maxLng = routeCoordinates.first.longitude;
+
+          for (var point in routeCoordinates) {
+            minLat = min(minLat, point.latitude);
+            maxLat = max(maxLat, point.latitude);
+            minLng = min(minLng, point.longitude);
+            maxLng = max(maxLng, point.longitude);
+          }
+
+          // Add padding (10%)
+          final latPadding = (maxLat - minLat) * 0.1;
+          final lngPadding = (maxLng - minLng) * 0.1;
+
+          // Calculate center point
+          final centerLat = (minLat + maxLat) / 2;
+          final centerLng = (minLng + maxLng) / 2;
+
+          // Calculate height and width in degrees
+          final heightDegrees = (maxLat - minLat) + (2 * latPadding);
+          final widthDegrees = (maxLng - minLng) + (2 * lngPadding);
+
+          // Calculate zoom level
+          final latZoom = log(170 / heightDegrees) / log(2);
+          final lngZoom = log(360 / widthDegrees) / log(2);
+          final zoom = min(latZoom, lngZoom);
+
+          mapController.move(
+            LatLng(centerLat, centerLng),
+            min(zoom, 15), // Limit maximum zoom to 15
+          );
+        }
+
         _showRouteInstructions();
       } else {
         _showToast("Failed to fetch route instructions.");
@@ -540,6 +578,7 @@ class _FishingMapState extends State<FishingMap> {
                 }
 
                 return FlutterMap(
+                  mapController: mapController,
                   options: MapOptions(
                     initialCenter: userLocation!,
                     initialZoom: 10.0,
