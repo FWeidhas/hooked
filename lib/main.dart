@@ -57,7 +57,7 @@ class MainApp extends StatelessWidget {
           '/register': (context) => const RegistrationPage(),
           '/map': (context) => const AuthGuard(child: FishingMap()),
           '/fishing_spots': (context) => AuthGuard(child: FishingSpots()),
-          '/fishes': (context) => AuthGuard(child: FishPage()),
+          '/fish': (context) => AuthGuard(child: FishPage()),
           '/weather': (context) {
             final args = ModalRoute.of(context)!.settings.arguments
                 as Map<String, dynamic>;
