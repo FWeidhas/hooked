@@ -177,12 +177,13 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                   ),
                 const SizedBox(height: 16),
                 if (widget.fishingSpot.picture != null)
-                  SizedBox(
+                  Container(
                     width: 300,
                     height: 300,
                     child: CldImageWidget(
                       cloudinary: cloudinary,
                       publicId: widget.fishingSpot.picture!,
+                      fit: BoxFit.cover,
                       errorBuilder: (context, url, error) =>
                           const Icon(Icons.error),
                     ),
