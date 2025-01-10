@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooked/database/user_service.dart';
 import 'package:hooked/models/fish.dart';
 import 'package:hooked/models/fishingSpot.dart';
 import 'package:hooked/models/user.dart';
 import 'package:hooked/pages/add_fishing_spot_page.dart';
 import 'package:hooked/pages/edit_fishing_spot_page.dart';
+import 'package:hooked/pages/fishing_spot_weather_screen.dart';
 import '../drawer.dart';
 import '../components/themetoggle.dart';
 import '../database/fishing_spot_service.dart';
@@ -67,7 +69,7 @@ class FishingSpots extends StatelessWidget {
 
               return Card(
                 margin: const EdgeInsets.all(10),
-                child: ListTile(
+                child: ExpansionTile(
                   leading: fishingSpot.picture != null
                       ? SizedBox(
                           width: 50,
@@ -78,8 +80,8 @@ class FishingSpots extends StatelessWidget {
                           ),
                         )
                       : const Icon(Icons.image_not_supported),
-                  title: Text(data['title'] ?? 'No title'),
-                  subtitle: Text(data['description'] ?? 'No description'),
+                  title: Text(fishingSpot.title ?? 'No title'),
+                  subtitle: Text(fishingSpot.description ?? 'No description'),
                   trailing: SizedBox(
                     width: 100,
                     child: Row(
@@ -113,6 +115,141 @@ class FishingSpots extends StatelessWidget {
                       ],
                     ),
                   ),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Main Image
+                          if (fishingSpot.picture != null)
+                            Center(
+                              child: SizedBox(
+                                width: 200,
+                                height: 200,
+                                child: CldImageWidget(
+                                  cloudinary: cloudinary,
+                                  publicId: fishingSpot.picture!,
+                                ),
+                              ),
+                            ),
+                          const SizedBox(height: 16),
+
+                          // Basic Information
+                          const Text('Spot Details:',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                          const SizedBox(height: 8),
+                          Text(
+                              'Title: ${fishingSpot.title ?? 'Not specified'}'),
+                          Text(
+                              'Description: ${fishingSpot.description ?? 'Not specified'}'),
+                          const SizedBox(height: 16),
+
+                          // Location Information
+                          const Text('Location:',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                          const SizedBox(height: 8),
+                          Text(
+                              'Latitude: ${fishingSpot.latitude?.toStringAsFixed(6) ?? 'Not specified'}'),
+                          Text(
+                              'Longitude: ${fishingSpot.longitude?.toStringAsFixed(6) ?? 'Not specified'}'),
+                          const SizedBox(height: 16),
+
+                          // Weather Button
+                          if (fishingSpot.latitude != null &&
+                              fishingSpot.longitude != null)
+                            ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        FishingSpotWeatherScreen(
+                                      latitude: fishingSpot.latitude!,
+                                      longitude: fishingSpot.longitude!,
+                                      title: fishingSpot.title!,
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .tertiaryContainer,
+                              ),
+                              icon: Icon(
+                                FontAwesomeIcons.cloudSun,
+                                color: Theme.of(context).iconTheme.color,
+                              ),
+                              label: Text(
+                                'Check 7 Day Weather',
+                                style: Theme.of(context).textTheme.labelMedium,
+                              ),
+                            ),
+                          const SizedBox(height: 16),
+
+                          // Creator Information
+                          const Text('Created by:',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                          const SizedBox(height: 8),
+                          FutureBuilder<User?>(
+                            future: getUserForSpot(fishingSpot),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              }
+                              return Text(snapshot.data?.email ?? 'Unknown');
+                            },
+                          ),
+                          const SizedBox(height: 16),
+
+                          // Fish List
+                          const Text('Fish at this Spot:',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
+                          const SizedBox(height: 8),
+                          FutureBuilder<List<Fish>>(
+                            future: getFishesForSpot(fishingSpot),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return const CircularProgressIndicator();
+                              }
+                              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return const Text(
+                                    'No fish recorded at this spot');
+                              }
+                              return Column(
+                                children: snapshot.data!
+                                    .map((fish) => Card(
+                                          child: ListTile(
+                                            leading: fish.picture != null
+                                                ? SizedBox(
+                                                    width: 40,
+                                                    height: 40,
+                                                    child: CldImageWidget(
+                                                      cloudinary: cloudinary,
+                                                      publicId: fish.picture!,
+                                                    ),
+                                                  )
+                                                : const Icon(
+                                                    FontAwesomeIcons.fish),
+                                            title: Text(
+                                                fish.name ?? 'Unknown Fish'),
+                                          ),
+                                        ))
+                                    .toList(),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               );
             },

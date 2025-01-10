@@ -234,7 +234,7 @@ class _FishingMapState extends State<FishingMap> {
                                         borderRadius: BorderRadius.circular(8),
                                         child: Image.network(
                                           fish.picture!,
-                                          fit: BoxFit.cover,
+                                          fit: BoxFit.fill,
                                           errorBuilder:
                                               (context, error, stackTrace) {
                                             return const Icon(
