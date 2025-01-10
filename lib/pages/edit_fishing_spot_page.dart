@@ -8,7 +8,6 @@ import 'package:hooked/database/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/cloudinary/cloudinary_service.dart';
 import 'package:hooked/models/user.dart' as models;
-import 'package:hooked/pages/fishing_spot_weather_screen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:cloudinary_flutter/image/cld_image.dart';
@@ -189,28 +188,6 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                     ),
                   ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FishingSpotWeatherScreen(
-                          latitude: widget.fishingSpot.latitude!,
-                          longitude: widget.fishingSpot.longitude!,
-                          title: widget.fishingSpot.title!,
-                        ),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.tertiaryContainer,
-                  ),
-                  child: Text(
-                    'Check 7 Day Weather',
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                ),
                 TextFormField(
                   controller: _latitudeController,
                   decoration: const InputDecoration(labelText: 'Latitude'),

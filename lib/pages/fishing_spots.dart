@@ -161,8 +161,6 @@ class FishingSpots extends StatelessWidget {
                           if (fishingSpot.latitude != null &&
                               fishingSpot.longitude != null)
                             ElevatedButton.icon(
-                              icon: const Icon(Icons.wb_sunny),
-                              label: const Text('Check Weather'),
                               onPressed: () {
                                 Navigator.push(
                                   context,
@@ -176,6 +174,16 @@ class FishingSpots extends StatelessWidget {
                                   ),
                                 );
                               },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .tertiaryContainer,
+                              ),
+                              icon: const Icon(FontAwesomeIcons.cloudSun),
+                              label: Text(
+                                'Check 7 Day Weather',
+                                style: Theme.of(context).textTheme.labelMedium,
+                              ),
                             ),
                           const SizedBox(height: 16),
 
