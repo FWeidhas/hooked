@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:hooked/models/fish.dart';
 import 'package:hooked/models/fishingSpot.dart';
 import 'package:hooked/database/fishing_spot_service.dart';
-import 'package:hooked/database/fish_service.dart';
 import 'package:hooked/database/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/cloudinary/cloudinary_service.dart';
@@ -48,8 +47,45 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
   late TextEditingController _latitudeController;
   late TextEditingController _longitudeController;
   late TextEditingController _creatorController;
-  late TextEditingController _fishesController;
   String? _uploadedImageUrl;
+  bool _isCreator = false;
+
+  List<Fish> _availableFishes = [];
+  Fish? _selectedFish;
+  List<Fish> _selectedFishes = [];
+
+  Future<void> _loadAvailableFishes() async {
+    // Get all fishes
+    final snapshot = await FirebaseFirestore.instance.collection('Fish').get();
+    final allFishes =
+        snapshot.docs.map((doc) => Fish.fromMap(doc.data(), doc.id)).toList();
+
+    // Filter out fishes that are already in the fishing spot
+    final existingFishIds = widget.fishes?.map((f) => f.id).toSet() ?? {};
+    setState(() {
+      _availableFishes = allFishes
+          .where((fish) => !existingFishIds.contains(fish.id))
+          .toList();
+      _selectedFishes = widget.fishes?.toList() ?? [];
+    });
+  }
+
+  void _addSelectedFish() {
+    if (_selectedFish != null && !_selectedFishes.contains(_selectedFish)) {
+      setState(() {
+        _selectedFishes.add(_selectedFish!);
+        _availableFishes.remove(_selectedFish);
+        _selectedFish = null;
+      });
+    }
+  }
+
+  void _removeFish(Fish fish) {
+    setState(() {
+      _selectedFishes.remove(fish);
+      _availableFishes.add(fish);
+    });
+  }
 
   Future<void> _selectAndUploadImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -80,12 +116,9 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
         TextEditingController(text: widget.fishingSpot.latitude?.toString());
     _longitudeController =
         TextEditingController(text: widget.fishingSpot.longitude?.toString());
-
     _creatorController = TextEditingController(text: widget.user.email);
-
-    _fishesController = TextEditingController(
-      text: widget.fishes?.map((fish) => fish.name).join(', ') ?? '',
-    );
+    _isCreator = _auth.currentUser?.email == widget.user.email;
+    _loadAvailableFishes();
   }
 
   @override
@@ -112,6 +145,7 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                     }
                     return null;
                   },
+                  readOnly: !_isCreator,
                 ),
                 TextFormField(
                   controller: _descriptionController,
@@ -122,6 +156,7 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                     }
                     return null;
                   },
+                  readOnly: !_isCreator,
                 ),
                 TextFormField(
                   controller: _pictureController,
@@ -129,22 +164,23 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                   readOnly: true,
                 ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: _selectAndUploadImage,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.tertiaryContainer,
+                if (_isCreator)
+                  ElevatedButton(
+                    onPressed: _selectAndUploadImage,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.tertiaryContainer,
+                    ),
+                    child: Text(
+                      'Select and Upload Image',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
                   ),
-                  child: Text(
-                    'Select and Upload Image',
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
-                ),
                 const SizedBox(height: 16),
                 if (widget.fishingSpot.picture != null)
                   SizedBox(
-                    width: 100,
-                    height: 100,
+                    width: 300,
+                    height: 300,
                     child: CldImageWidget(
                       cloudinary: cloudinary,
                       publicId: widget.fishingSpot.picture!,
@@ -153,7 +189,6 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                     ),
                   ),
                 const SizedBox(height: 16),
-                // Check Weather button
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -180,132 +215,137 @@ class _EditFishingSpotPageState extends State<EditFishingSpotPage> {
                   controller: _latitudeController,
                   decoration: const InputDecoration(labelText: 'Latitude'),
                   keyboardType: TextInputType.number,
+                  readOnly: !_isCreator,
                 ),
                 TextFormField(
                   controller: _longitudeController,
                   decoration: const InputDecoration(labelText: 'Longitude'),
                   keyboardType: TextInputType.number,
+                  readOnly: !_isCreator,
                 ),
                 TextFormField(
                   controller: _creatorController,
                   decoration: const InputDecoration(labelText: 'Creator'),
+                  readOnly: true,
                 ),
-                TextFormField(
-                  controller: _fishesController,
-                  decoration: const InputDecoration(
-                      labelText: 'Fishes (comma separated)'),
-                ),
-                if (widget.fishes != null && widget.fishes!.isNotEmpty)
-                  Column(
-                    children: widget.fishes!.map((fish) {
-                      return Column(
-                        children: [
-                          Text(fish.name ?? 'Unknown Fish'),
-                          if (fish.picture != null)
-                            SizedBox(
-                              width: 100,
-                              height: 100,
-                              child: CldImageWidget(
-                                cloudinary: cloudinary,
-                                publicId: fish.picture!,
-                                errorBuilder: (context, url, error) =>
-                                    const Icon(Icons.error),
-                              ),
-                            ),
-                        ],
-                      );
-                    }).toList(),
+                const SizedBox(height: 16),
+                if (_isCreator)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<Fish>(
+                          value: _selectedFish,
+                          hint: const Text('Select a fish to add'),
+                          items: _availableFishes.map((Fish fish) {
+                            return DropdownMenuItem<Fish>(
+                              value: fish,
+                              child: Text(fish.name ?? 'Unknown Fish'),
+                            );
+                          }).toList(),
+                          onChanged: (Fish? newValue) {
+                            setState(() {
+                              _selectedFish = newValue;
+                            });
+                          },
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: _addSelectedFish,
+                      ),
+                    ],
                   ),
                 const SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      // Check if the logged-in user's email matches the creator's email
-                      if (_auth.currentUser?.email != widget.user.email) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text(
-                                  'You do not have permission to edit this fishing spot.')),
-                        );
-                        return;
-                      }
-
-                      List<String> fishNames = _fishesController.text
-                          .split(',')
-                          .map((e) => e.trim())
-                          .toList();
-                      List<DocumentReference> fishRefs = [];
-
-                      bool validFishs = true;
-                      for (String fishName in fishNames) {
-                        DocumentReference? fishRef =
-                            await getFishByName(fishName);
-                        if (fishRef == null) {
-                          validFishs = false;
-                          break;
-                        } else {
-                          fishRefs.add(fishRef);
-                        }
-                      }
-
-                      if (fishRefs.isEmpty || !validFishs) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Please enter valid fishs.')),
-                        );
-                        return;
-                      }
-
-                      DocumentReference? userRef =
-                          await getUserByEmail(_creatorController.text);
-
-                      if (userRef == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text(
-                                  'Creator not found. Please enter a valid email.')),
-                        );
-                        return;
-                      }
-
-                      double? latitude =
-                          double.tryParse(_latitudeController.text);
-                      double? longitude =
-                          double.tryParse(_longitudeController.text);
-
-                      if (latitude == null || longitude == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text(
-                                  'Please enter valid latitude and longitude.')),
-                        );
-                        return;
-                      }
-
-                      FishingSpot updatedSpot = FishingSpot(
-                        id: widget.fishingSpot.id,
-                        title: _titleController.text,
-                        description: _descriptionController.text,
-                        picture:
-                            _uploadedImageUrl ?? widget.fishingSpot.picture,
-                        latitude: latitude,
-                        longitude: longitude,
-                        creator: userRef,
-                        fishes: fishRefs,
-                      );
-                      await updateFishingSpot(widget.docId, updatedSpot);
-                      Navigator.pop(context);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primaryContainer,
-                  ),
-                  child: Text(
-                    'Save',
-                    style: Theme.of(context).textTheme.labelMedium,
-                  ),
+                const Text('Selected Fishes:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Column(
+                  children: _selectedFishes.map((fish) {
+                    return Card(
+                      child: ListTile(
+                        title: Text(fish.name ?? 'Unknown Fish'),
+                        leading: fish.picture != null
+                            ? SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: CldImageWidget(
+                                  cloudinary: cloudinary,
+                                  publicId: fish.picture!,
+                                  errorBuilder: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
+                              )
+                            : null,
+                        trailing: _isCreator
+                            ? IconButton(
+                                icon: const Icon(Icons.remove),
+                                onPressed: () => _removeFish(fish),
+                              )
+                            : null,
+                      ),
+                    );
+                  }).toList(),
                 ),
+                const SizedBox(height: 16),
+                if (_isCreator)
+                  ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        List<DocumentReference> fishRefs = _selectedFishes
+                            .map((fish) => FirebaseFirestore.instance
+                                .collection('Fish')
+                                .doc(fish.id))
+                            .toList();
+
+                        DocumentReference? userRef =
+                            await getUserByEmail(_creatorController.text);
+
+                        if (userRef == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Creator not found. Please enter a valid email.')),
+                          );
+                          return;
+                        }
+
+                        double? latitude =
+                            double.tryParse(_latitudeController.text);
+                        double? longitude =
+                            double.tryParse(_longitudeController.text);
+
+                        if (latitude == null || longitude == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Please enter valid latitude and longitude.')),
+                          );
+                          return;
+                        }
+
+                        FishingSpot updatedSpot = FishingSpot(
+                          id: widget.fishingSpot.id,
+                          title: _titleController.text,
+                          description: _descriptionController.text,
+                          picture:
+                              _uploadedImageUrl ?? widget.fishingSpot.picture,
+                          latitude: latitude,
+                          longitude: longitude,
+                          creator: userRef,
+                          fishes: fishRefs,
+                        );
+                        await updateFishingSpot(widget.docId, updatedSpot);
+                        Navigator.pop(context);
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer,
+                    ),
+                    child: Text(
+                      'Save',
+                      style: Theme.of(context).textTheme.labelMedium,
+                    ),
+                  ),
                 const SizedBox(height: 8),
               ],
             ),

@@ -21,7 +21,6 @@ class CloudinaryService {
       final responseString = String.fromCharCodes(responseData);
       final jsonMap = jsonDecode(responseString);
       final url = jsonMap['url'];
-      print(url);
       return url;
     }
     return null;

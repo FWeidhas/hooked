@@ -42,3 +42,11 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Generated plugin registrant files
+gradle.properties
+generated_plugin_registrant.cc
+generated_plugins.cmake
+GeneratedPluginRegistrant.swift
+generated_plugin_registrant.cc
+generated_plugins_cmake
