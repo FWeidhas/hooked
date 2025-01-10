@@ -179,7 +179,10 @@ class FishingSpots extends StatelessWidget {
                                     .colorScheme
                                     .tertiaryContainer,
                               ),
-                              icon: const Icon(FontAwesomeIcons.cloudSun),
+                              icon: Icon(
+                                FontAwesomeIcons.cloudSun,
+                                color: Theme.of(context).iconTheme.color,
+                              ),
                               label: Text(
                                 'Check 7 Day Weather',
                                 style: Theme.of(context).textTheme.labelMedium,
