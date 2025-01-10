@@ -77,7 +77,7 @@ class FishingSpots extends StatelessWidget {
                           child: CldImageWidget(
                             cloudinary: cloudinary,
                             publicId: fishingSpot.picture!,
-                            fit: BoxFit.cover,
+                            fit: BoxFit.fill,
                           ),
                         )
                       : const Icon(Icons.image_not_supported),
@@ -131,7 +131,7 @@ class FishingSpots extends StatelessWidget {
                                 child: CldImageWidget(
                                   cloudinary: cloudinary,
                                   publicId: fishingSpot.picture!,
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.fill,
                                 ),
                               ),
                             ),
@@ -239,7 +239,7 @@ class FishingSpots extends StatelessWidget {
                                                     child: CldImageWidget(
                                                       cloudinary: cloudinary,
                                                       publicId: fish.picture!,
-                                                      fit: BoxFit.cover,
+                                                      fit: BoxFit.fill,
                                                     ),
                                                   )
                                                 : const Icon(
