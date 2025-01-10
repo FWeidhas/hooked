@@ -40,25 +40,36 @@ class WeatherForecastWidget extends StatelessWidget {
               // Creating a card for each day's forecast
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: ExpansionTile(
-                  // Displaying the formatted date as the title
-                  title: Text(
-                    DateFormat('EEEE, MMMM d')
-                        .format(dailyForecasts.first.date),
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  children: [
-                    // Displaying the weather data for each time slot (6AM, 12PM, 6PM)
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: dailyForecasts
-                            .map((weather) => _buildTimeSlot(weather))
-                            .toList(),
-                      ),
+                child: Theme(
+                  data: Theme.of(context).copyWith(
+                    expansionTileTheme: ExpansionTileThemeData(
+                      backgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer,
+                      collapsedBackgroundColor:
+                          Theme.of(context).colorScheme.primaryContainer,
                     ),
-                  ],
+                  ),
+                  child: ExpansionTile(
+                    // Displaying the formatted date as the title
+                    title: Text(
+                      DateFormat('EEEE, MMMM d')
+                          .format(dailyForecasts.first.date),
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    children: [
+                      // Displaying the weather data for each time slot (6AM, 12PM, 6PM)
+                      Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: dailyForecasts
+                              .map(
+                                  (weather) => _buildTimeSlot(context, weather))
+                              .toList(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -69,10 +80,11 @@ class WeatherForecastWidget extends StatelessWidget {
   }
 
   // Helper function to create a time slot card for each forecasted time
-  Widget _buildTimeSlot(DailyWeather weather) {
+  Widget _buildTimeSlot(BuildContext context, DailyWeather weather) {
+    Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
     return Expanded(
       child: Container(
-        color: Colors.blue.shade400,
+        color: primaryColor,
         padding: const EdgeInsets.all(8),
         child: Column(
           children: [
