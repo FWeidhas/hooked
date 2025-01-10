@@ -71,7 +71,7 @@ class FishingSpots extends StatelessWidget {
                 margin: const EdgeInsets.all(10),
                 child: ExpansionTile(
                   leading: fishingSpot.picture != null
-                      ? SizedBox(
+                      ? Container(
                           width: 50,
                           height: 50,
                           child: CldImageWidget(
@@ -239,7 +239,7 @@ class FishingSpots extends StatelessWidget {
                                                     child: CldImageWidget(
                                                       cloudinary: cloudinary,
                                                       publicId: fish.picture!,
-                                                      fit: BoxFit.cover,
+                                                      fit: BoxFit.contain,
                                                     ),
                                                   )
                                                 : const Icon(
