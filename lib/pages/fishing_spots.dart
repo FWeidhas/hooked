@@ -40,7 +40,7 @@ class FishingSpots extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const AddFishingSpotPage(),
+              builder: (context) => AddFishingSpotPage(),
             ),
           );
         },
@@ -54,7 +54,7 @@ class FishingSpots extends StatelessWidget {
           }
 
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const CircularProgressIndicator();
+            return const Center(child: CircularProgressIndicator());
           }
 
           return ListView.builder(

@@ -53,10 +53,10 @@ class CustomDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.pets),
-            title: const Text('Fishes'),
+            title: const Text('Fish'),
             onTap: () {
               Navigator.pop(context); // Close the drawer
-              Navigator.pushNamed(context, '/fishes');
+              Navigator.pushNamed(context, '/fish');
             },
           ),
           const Divider(),

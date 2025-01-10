@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:hooked/models/fish.dart';
 import 'package:hooked/models/fishingSpot.dart';
 import 'package:hooked/database/fishing_spot_service.dart';
-import 'package:hooked/database/fish_service.dart';
 import 'package:hooked/database/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:hooked/cloudinary/cloudinary_service.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:cloudinary_flutter/cloudinary_object.dart';
+import 'package:cloudinary_flutter/image/cld_image.dart';
 
 final firestore = FirebaseFirestore.instance;
 final cloudinaryService = CloudinaryService();
 final ImagePicker _picker = ImagePicker();
+late CloudinaryObject cloudinary;
 
 class AddFishingSpotPage extends StatefulWidget {
-  const AddFishingSpotPage({super.key});
+  AddFishingSpotPage({super.key}) {
+    cloudinary = CloudinaryObject.fromCloudName(
+        cloudName: dotenv.env['CLOUDINARY_CLOUD_NAME']!);
+  }
 
   @override
   State<AddFishingSpotPage> createState() => _AddFishingSpotPageState();
@@ -26,8 +33,44 @@ class _AddFishingSpotPageState extends State<AddFishingSpotPage> {
   final _latitudeController = TextEditingController();
   final _longitudeController = TextEditingController();
   final _creatorController = TextEditingController();
-  final _fishesController = TextEditingController();
   String? _uploadedImageUrl;
+
+  List<Fish> _availableFishes = [];
+  Fish? _selectedFish;
+  List<Fish> _selectedFishes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvailableFishes();
+  }
+
+  Future<void> _loadAvailableFishes() async {
+    final snapshot = await FirebaseFirestore.instance.collection('Fish').get();
+    final allFishes =
+        snapshot.docs.map((doc) => Fish.fromMap(doc.data(), doc.id)).toList();
+
+    setState(() {
+      _availableFishes = allFishes;
+    });
+  }
+
+  void _addSelectedFish() {
+    if (_selectedFish != null && !_selectedFishes.contains(_selectedFish)) {
+      setState(() {
+        _selectedFishes.add(_selectedFish!);
+        _availableFishes.remove(_selectedFish);
+        _selectedFish = null;
+      });
+    }
+  }
+
+  void _removeFish(Fish fish) {
+    setState(() {
+      _selectedFishes.remove(fish);
+      _availableFishes.add(fish);
+    });
+  }
 
   Future<void> _selectAndUploadImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -99,55 +142,130 @@ class _AddFishingSpotPageState extends State<AddFishingSpotPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                if (_uploadedImageUrl != null)
+                  SizedBox(
+                    width: 100,
+                    height: 100,
+                    child: CldImageWidget(
+                      cloudinary: cloudinary,
+                      publicId: _uploadedImageUrl!,
+                      errorBuilder: (context, url, error) =>
+                          const Icon(Icons.error),
+                    ),
+                  ),
+                const SizedBox(height: 16),
                 TextFormField(
                   controller: _latitudeController,
                   decoration: const InputDecoration(labelText: 'Latitude'),
                   keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter latitude';
+                    }
+                    return null;
+                  },
                 ),
                 TextFormField(
                   controller: _longitudeController,
                   decoration: const InputDecoration(labelText: 'Longitude'),
                   keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter longitude';
+                    }
+                    return null;
+                  },
                 ),
                 TextFormField(
                   controller: _creatorController,
                   decoration:
                       const InputDecoration(labelText: 'Email from creator'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter creator email';
+                    }
+                    return null;
+                  },
                 ),
-                TextFormField(
-                  controller: _fishesController,
-                  decoration: const InputDecoration(
-                      labelText: 'Fishes (comma separated)'),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<Fish>(
+                        value: _selectedFish,
+                        hint: const Text('Select a fish to add'),
+                        items: _availableFishes.map((Fish fish) {
+                          return DropdownMenuItem<Fish>(
+                            value: fish,
+                            child: Text(fish.name ?? 'Unknown Fish'),
+                          );
+                        }).toList(),
+                        onChanged: (Fish? newValue) {
+                          setState(() {
+                            _selectedFish = newValue;
+                          });
+                        },
+                        validator: (value) {
+                          if (_selectedFishes.isEmpty) {
+                            return 'Please select at least one fish';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: _addSelectedFish,
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (_selectedFishes.isNotEmpty)
+                  const Text('Selected Fishes:',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                Column(
+                  children: _selectedFishes.map((fish) {
+                    return Card(
+                      child: ListTile(
+                        title: Text(fish.name ?? 'Unknown Fish'),
+                        leading: fish.picture != null
+                            ? SizedBox(
+                                width: 50,
+                                height: 50,
+                                child: CldImageWidget(
+                                  cloudinary: cloudinary,
+                                  publicId: fish.picture!,
+                                  errorBuilder: (context, url, error) =>
+                                      const Icon(Icons.error),
+                                ),
+                              )
+                            : null,
+                        trailing: IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () => _removeFish(fish),
+                        ),
+                      ),
+                    );
+                  }).toList(),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      List<String> fishNames = _fishesController.text
-                          .split(',')
-                          .map((e) => e.trim())
-                          .toList();
-                      List<DocumentReference> fishRefs = [];
-
-                      bool validFishs = true;
-                      for (String fishName in fishNames) {
-                        DocumentReference? fishRef =
-                            await getFishByName(fishName);
-                        if (fishRef == null) {
-                          validFishs = false;
-                          break;
-                        } else {
-                          fishRefs.add(fishRef);
-                        }
-                      }
-
-                      if (fishRefs.isEmpty || !validFishs) {
+                      if (_selectedFishes.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                              content: Text('Please enter valid fishs.')),
+                              content:
+                                  Text('Please select at least one fish.')),
                         );
                         return;
                       }
+
+                      List<DocumentReference> fishRefs = _selectedFishes
+                          .map((fish) => FirebaseFirestore.instance
+                              .collection('Fish')
+                              .doc(fish.id))
+                          .toList();
 
                       DocumentReference? userRef =
                           await getUserByEmail(_creatorController.text);
