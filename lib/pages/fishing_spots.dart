@@ -71,12 +71,13 @@ class FishingSpots extends StatelessWidget {
                 margin: const EdgeInsets.all(10),
                 child: ExpansionTile(
                   leading: fishingSpot.picture != null
-                      ? SizedBox(
+                      ? Container(
                           width: 50,
                           height: 50,
                           child: CldImageWidget(
                             cloudinary: cloudinary,
                             publicId: fishingSpot.picture!,
+                            fit: BoxFit.cover,
                           ),
                         )
                       : const Icon(Icons.image_not_supported),
@@ -124,12 +125,13 @@ class FishingSpots extends StatelessWidget {
                           // Main Image
                           if (fishingSpot.picture != null)
                             Center(
-                              child: SizedBox(
+                              child: Container(
                                 width: 200,
                                 height: 200,
                                 child: CldImageWidget(
                                   cloudinary: cloudinary,
                                   publicId: fishingSpot.picture!,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
                             ),
@@ -226,11 +228,14 @@ class FishingSpots extends StatelessWidget {
                               return Column(
                                 children: snapshot.data!
                                     .map((fish) => Card(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer,
                                           child: ListTile(
                                             leading: fish.picture != null
-                                                ? SizedBox(
-                                                    width: 40,
-                                                    height: 40,
+                                                ? Container(
+                                                    width: 50,
+                                                    height: 50,
                                                     child: CldImageWidget(
                                                       cloudinary: cloudinary,
                                                       publicId: fish.picture!,
