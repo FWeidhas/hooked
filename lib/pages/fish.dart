@@ -65,12 +65,13 @@ class FishPage extends StatelessWidget {
                 margin: const EdgeInsets.all(10),
                 child: ListTile(
                   leading: fish.picture != null
-                      ? SizedBox(
+                      ? Container(
                           width: 50,
                           height: 50,
                           child: CldImageWidget(
                             cloudinary: cloudinary,
                             publicId: fish.picture!,
+                            fit: BoxFit.fill,
                           ),
                         )
                       : const Icon(Icons.image_not_supported),
