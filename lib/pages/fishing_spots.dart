@@ -71,13 +71,13 @@ class FishingSpots extends StatelessWidget {
                 margin: const EdgeInsets.all(10),
                 child: ExpansionTile(
                   leading: fishingSpot.picture != null
-                      ? Container(
+                      ? SizedBox(
                           width: 50,
                           height: 50,
                           child: CldImageWidget(
                             cloudinary: cloudinary,
                             publicId: fishingSpot.picture!,
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover,
                           ),
                         )
                       : const Icon(Icons.image_not_supported),
@@ -228,6 +228,9 @@ class FishingSpots extends StatelessWidget {
                               return Column(
                                 children: snapshot.data!
                                     .map((fish) => Card(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .primaryContainer,
                                           child: ListTile(
                                             leading: fish.picture != null
                                                 ? Container(
