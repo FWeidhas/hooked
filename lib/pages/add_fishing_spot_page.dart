@@ -9,11 +9,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:cloudinary_flutter/image/cld_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 final firestore = FirebaseFirestore.instance;
 final cloudinaryService = CloudinaryService();
 final ImagePicker _picker = ImagePicker();
 late CloudinaryObject cloudinary;
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class AddFishingSpotPage extends StatefulWidget {
   AddFishingSpotPage({super.key}) {
@@ -177,9 +179,10 @@ class _AddFishingSpotPageState extends State<AddFishingSpotPage> {
                   },
                 ),
                 TextFormField(
-                  controller: _creatorController,
-                  decoration:
-                      const InputDecoration(labelText: 'Email from creator'),
+                  controller: _creatorController
+                    ..text = _auth.currentUser?.email! ?? '',
+                  decoration: const InputDecoration(labelText: 'Creator Email'),
+                  enabled: false,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter creator email';

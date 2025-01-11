@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooked/database/user_service.dart';
 import 'package:hooked/models/fish.dart';
 import 'package:hooked/models/fishingSpot.dart';
-import 'package:hooked/models/user.dart';
+import 'package:hooked/models/user.dart' as HookedUser;
 import 'package:hooked/pages/add_fishing_spot_page.dart';
 import 'package:hooked/pages/edit_fishing_spot_page.dart';
 import 'package:hooked/pages/fishing_spot_weather_screen.dart';
@@ -17,6 +18,7 @@ import 'package:cloudinary_flutter/cloudinary_object.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 late CloudinaryObject cloudinary;
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class FishingSpots extends StatelessWidget {
   FishingSpots({super.key}) {
@@ -83,38 +85,52 @@ class FishingSpots extends StatelessWidget {
                       : const Icon(Icons.image_not_supported),
                   title: Text(fishingSpot.title ?? 'No title'),
                   subtitle: Text(fishingSpot.description ?? 'No description'),
-                  trailing: SizedBox(
-                    width: 100,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () async {
-                            List<Fish> fishes =
-                                await getFishesForSpot(fishingSpot);
-                            User? user = await getUserForSpot(fishingSpot);
-                            if (user == null) {
-                              return;
-                            }
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => EditFishingSpotPage(
-                                      docId: document.id,
-                                      fishingSpot: fishingSpot,
-                                      fishes: fishes,
-                                      user: user)),
-                            );
-                          },
+                  trailing: FutureBuilder<HookedUser.User?>(
+                    future: getUserForSpot(fishingSpot),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const SizedBox(width: 100);
+                      }
+                      bool isCreator =
+                          snapshot.data?.email == _auth.currentUser?.email;
+
+                      return SizedBox(
+                        width: 100,
+                        child: Row(
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit),
+                              onPressed: () async {
+                                List<Fish> fishes =
+                                    await getFishesForSpot(fishingSpot);
+                                HookedUser.User? user =
+                                    await getUserForSpot(fishingSpot);
+                                if (user == null) {
+                                  return;
+                                }
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditFishingSpotPage(
+                                        docId: document.id,
+                                        fishingSpot: fishingSpot,
+                                        fishes: fishes,
+                                        user: user),
+                                  ),
+                                );
+                              },
+                            ),
+                            if (isCreator)
+                              IconButton(
+                                icon: const Icon(Icons.delete),
+                                onPressed: () {
+                                  deleteFishingSpot(document.id);
+                                },
+                              ),
+                          ],
                         ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () {
-                            deleteFishingSpot(document.id);
-                          },
-                        ),
-                      ],
-                    ),
+                      );
+                    },
                   ),
                   children: [
                     Padding(
@@ -122,7 +138,6 @@ class FishingSpots extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Main Image
                           if (fishingSpot.picture != null)
                             Center(
                               child: Container(
@@ -136,8 +151,6 @@ class FishingSpots extends StatelessWidget {
                               ),
                             ),
                           const SizedBox(height: 16),
-
-                          // Basic Information
                           const Text('Spot Details:',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16)),
@@ -147,8 +160,6 @@ class FishingSpots extends StatelessWidget {
                           Text(
                               'Description: ${fishingSpot.description ?? 'Not specified'}'),
                           const SizedBox(height: 16),
-
-                          // Location Information
                           const Text('Location:',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16)),
@@ -158,8 +169,6 @@ class FishingSpots extends StatelessWidget {
                           Text(
                               'Longitude: ${fishingSpot.longitude?.toStringAsFixed(6) ?? 'Not specified'}'),
                           const SizedBox(height: 16),
-
-                          // Weather Button
                           if (fishingSpot.latitude != null &&
                               fishingSpot.longitude != null)
                             ElevatedButton.icon(
@@ -191,13 +200,11 @@ class FishingSpots extends StatelessWidget {
                               ),
                             ),
                           const SizedBox(height: 16),
-
-                          // Creator Information
                           const Text('Created by:',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16)),
                           const SizedBox(height: 8),
-                          FutureBuilder<User?>(
+                          FutureBuilder<HookedUser.User?>(
                             future: getUserForSpot(fishingSpot),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState ==
@@ -208,8 +215,6 @@ class FishingSpots extends StatelessWidget {
                             },
                           ),
                           const SizedBox(height: 16),
-
-                          // Fish List
                           const Text('Fish at this Spot:',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 16)),
