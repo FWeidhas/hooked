@@ -6,6 +6,7 @@ class User {
   String? _surname;
   String? _email;
   List<DocumentReference>? _contacts;
+  List<DocumentReference>? _friendRequests; // Field for friend requests
 
   User({
     String? id,
@@ -13,11 +14,13 @@ class User {
     String? surname,
     String? email,
     List<DocumentReference>? contacts,
+    List<DocumentReference>? friendRequests,
   })  : _id = id,
         _name = name,
         _surname = surname,
         _email = email,
-        _contacts = contacts;
+        _contacts = contacts,
+        _friendRequests = friendRequests;
 
   // Getters
   String? get id => _id;
@@ -25,6 +28,7 @@ class User {
   String? get surname => _surname;
   String? get email => _email;
   List<DocumentReference>? get contacts => _contacts;
+  List<DocumentReference>? get friendRequests => _friendRequests;
 
   // Setters
   set id(String? id) {
@@ -47,12 +51,17 @@ class User {
     _contacts = contacts;
   }
 
+  set friendRequests(List<DocumentReference>? friendRequests) {
+    _friendRequests = friendRequests;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'name': _name,
       'surname': _surname,
       'email': _email,
       'contacts': _contacts,
+      'friendRequests': _friendRequests, // Include friend requests in map
     };
   }
 
@@ -65,6 +74,9 @@ class User {
       email: map['email'],
       contacts: map['contacts'] != null
           ? List<DocumentReference>.from(map['contacts'])
+          : [],
+      friendRequests: map['friendRequests'] != null
+          ? List<DocumentReference>.from(map['friendRequests'])
           : [],
     );
   }

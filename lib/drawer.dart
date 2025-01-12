@@ -33,7 +33,7 @@ class CustomDrawer extends StatelessWidget {
             leading: const Icon(Icons.map),
             title: const Text('Map'),
             onTap: () {
-              Navigator.pop(context); // Close the drawer
+              Navigator.pop(context);
               Navigator.pushNamed(context, '/map');
             },
           ),
@@ -41,7 +41,7 @@ class CustomDrawer extends StatelessWidget {
             leading: const Icon(Icons.location_on),
             title: const Text('Fishing Spots'),
             onTap: () {
-              Navigator.pop(context); // Close the drawer
+              Navigator.pop(context);
               Navigator.pushNamed(context, '/fishing_spots');
             },
           ),
@@ -49,8 +49,34 @@ class CustomDrawer extends StatelessWidget {
             leading: const Icon(FontAwesomeIcons.fish),
             title: const Text('Fish'),
             onTap: () {
-              Navigator.pop(context); // Close the drawer
+              Navigator.pop(context);
               Navigator.pushNamed(context, '/fish');
+            },
+          ),
+          ListTile(
+          leading: const Icon(Icons.group),
+          title: const Text('Friends'),
+          onTap: () {
+           Navigator.pop(context);
+           Navigator.pushNamed(context, '/friends');
+          },
+        ),
+          ListTile(
+            leading: const Icon(Icons.trip_origin),
+            title: const Text('Create Trip'),
+            onTap: () {
+              print('Navigiere zu Trips');
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/trips');
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.list),
+            title: const Text('My Trips'), // Eintrag für die Trips-Liste
+            onTap: () {
+              print('Navigiere zu Trips List');
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/trips_list');
             },
           ),
           const Divider(),
@@ -58,7 +84,6 @@ class CustomDrawer extends StatelessWidget {
             leading: const Icon(Icons.exit_to_app),
             title: const Text('Logout'),
             onTap: () async {
-              // Perform sign out
               await FirebaseAuth.instance.signOut();
               Navigator.pushNamedAndRemoveUntil(
                 context,
