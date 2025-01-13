@@ -2,6 +2,11 @@
 
 **Hooked** is a comprehensive fishing spot app designed to help anglers discover, document, and plan their fishing adventures. Whether you're exploring new locations or showcasing your latest catches, Hooked has got you covered.
 
+## Overview
+- [Features](#features)
+- [Get Started](#get-started)
+- [Image gallery](#image-gallery)
+
 ## Features
 
 ### 📝 Create an Account
@@ -56,4 +61,43 @@
    ```
 
 3. Start by running the main.dart
+
+## Image Gallery
+
+### Login Screens
+![Hooked_Login_Light](/assets/hooked_app_pictures/Login_Registration/Hooked_Login_Light.png)
+![Hooked_Login_Dark](/assets/hooked_app_pictures/Login_Registration/Hooked_Login_Dark.png)
+
+### Registration Screens
+![Hooked_Registration_Light](/assets/hooked_app_pictures/Login_Registration/Hooked_Registration_Light.png)
+![Hooked_Registration_Dark](/assets/hooked_app_pictures/Login_Registration/Hooked_Registration_Dark.png)
+
+### Drawer Screens
+![Hooked_Drawer_Light](/assets/hooked_app_pictures/Drawer/Hooked_Drawer_Light.png)
+![Hooked_Drawer_Dark](/assets/hooked_app_pictures/Drawer/Hooked_Drawer_Dark.png)
+
+### Map with routing Screens
+![Hooked_Map_Light](/assets/hooked_app_pictures/Map_Routing/Hooked_Map_Light.png)
+![Hooked_Map_Dark](/assets/hooked_app_pictures/Map_Routing/Hooked_Map_Dark.png)
+![Hooked_Map_Point_Light](/assets/hooked_app_pictures/Map_Routing/Hooked_Map_Point_Light.png)
+![Hooked_Point_Map_Dark](/assets/hooked_app_pictures/Map_Routing/Hooked_Point_Map_Dark.png)
+![Hooked_Routing_Light](/assets/hooked_app_pictures/Map_Routing/Hooked_Routing_Light.png)
+![Hooked_Routing_Dark](/assets/hooked_app_pictures/Map_Routing/Hooked_Routing_Dark.png)
+
+### Fishing Spots Screens
+![Hooked_Fishing_Spots_Light](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Light.png)
+![Hooked_Fishing_Spots_Dark](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Dark.png)
+![Hooked_Fishing_Spots_Expanded_Light](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Expanded_Light.png)
+![Hooked_Fishing_Spots_Expanded_Dark](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Expanded_Dark.png)
+![Hooked_Fishing_Spots_Add_Light](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Add_Light.png)
+![Hooked_Fishing_Spots_Add_Dark](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Add_Dark.png)
+![Hooked_Fishing_Spots_Edit_Light](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Edit_Light.png)
+![Hooked_Fishing_Spots_Edit_Dark](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Edit_Dark.png)
+
+### Fish Screens
+![Hooked_Fish_Light](/assets/hooked_app_pictures/Fish/Hooked_Fish_Light.png)
+![Hooked_Fish_Dark](/assets/hooked_app_pictures/Fish/Hooked_Fish_Dark.png)
+![Hooked_Fish_Edit_Light](/assets/hooked_app_pictures/Fish/Hooked_Fish_Edit_Light.png)
+![Hooked_Fish_Edit_Dark](/assets/hooked_app_pictures/Fish/Hooked_Fish_Edit_Dark.png)
+
 
