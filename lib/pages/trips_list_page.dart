@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
 import '../drawer.dart';
 import '../components/themetoggle.dart';
 
@@ -9,7 +10,6 @@ class TripsListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Grab the same color used in fish.dart:
     Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
     final currentUser = FirebaseAuth.instance.currentUser;
 
@@ -26,7 +26,7 @@ class TripsListPage extends StatelessWidget {
           },
         ),
         title: const Text('Your Trips'),
-        backgroundColor: primaryColor, // Same background color as FishPage
+        backgroundColor: primaryColor,
         actions: const [ThemeToggleWidget()],
       ),
       drawer: const CustomDrawer(),
@@ -56,9 +56,24 @@ class TripsListPage extends StatelessWidget {
                     final trip = trips[index];
                     final tripData = trip.data() as Map<String, dynamic>;
 
+                    // Parse the date string
+                    final dateString = tripData['date'] ?? '';
+                    DateTime? dateTime;
+                    try {
+                      dateTime = DateTime.parse(dateString);
+                    } catch (e) {
+                      // If parsing fails, we just won't crash
+                    }
+
+                    // Format the date if parse was successful
+                    String formattedDate = 'Unknown';
+                    if (dateTime != null) {
+                      formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+                    }
+
                     return ListTile(
-                      title: Text(tripData['name']),
-                      subtitle: Text('Date: ${tripData['date']}'),
+                      title: Text(tripData['name'] ?? 'No Trip Name'),
+                      subtitle: Text('Date: $formattedDate'),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -83,7 +98,6 @@ class TripDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Grab the same color used in fish.dart:
     Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
 
     return Scaffold(
@@ -99,7 +113,7 @@ class TripDetailsPage extends StatelessWidget {
           },
         ),
         title: const Text('Trip Details'),
-        backgroundColor: primaryColor, // Same color here, too
+        backgroundColor: primaryColor,
         actions: const [ThemeToggleWidget()],
       ),
       drawer: const CustomDrawer(),
@@ -114,21 +128,64 @@ class TripDetailsPage extends StatelessWidget {
           }
 
           final tripData = snapshot.data!.data() as Map<String, dynamic>;
+
+          // Parse and format date
+          final dateString = tripData['date'] ?? '';
+          DateTime? dateTime;
+          try {
+            dateTime = DateTime.parse(dateString);
+          } catch (e) {
+            // ignore
+          }
+          String formattedDate = 'Unknown';
+          if (dateTime != null) {
+            formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+          }
+
+          // Participants
+          final participants = tripData['participants'] as List<dynamic>? ?? [];
+          final spots = tripData['spots'] as List<dynamic>? ?? [];
+
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Name: ${tripData['name']}',
+                  'Name: ${tripData['name'] ?? 'No Trip Name'}',
                   style: const TextStyle(fontSize: 20),
                 ),
                 const SizedBox(height: 10),
-                Text('Date: ${tripData['date']}'),
+                Text('Date: $formattedDate'),
                 const SizedBox(height: 10),
-                Text('Participants: ${tripData['participants'].join(', ')}'),
+                Text('Participants: ${participants.join(', ')}'),
                 const SizedBox(height: 10),
-                Text('Spots: ${tripData['spots'].join(', ')}'),
+
+                if (spots.isEmpty)
+                  const Text('Spot: None selected')
+                else
+                  FutureBuilder<DocumentSnapshot>(
+                    future: FirebaseFirestore.instance
+                        .collection('FishingSpot')
+                        .doc(spots[0])
+                        .get(),
+                    builder: (context, spotSnapshot) {
+                      if (spotSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return const Text('Loading spot...');
+                      }
+                      if (!spotSnapshot.hasData ||
+                          !spotSnapshot.data!.exists) {
+                        return Text('Spot not found: ${spots[0]}');
+                      }
+
+                      final spotData =
+                          spotSnapshot.data!.data() as Map<String, dynamic>;
+                      final spotName = spotData['title'] ?? 'No Title';
+
+                      return Text('Spot: $spotName');
+                    },
+                  ),
               ],
             ),
           );

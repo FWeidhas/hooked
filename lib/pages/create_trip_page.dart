@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hooked/database/trip_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../drawer.dart';
 import '../components/themetoggle.dart';
+import 'package:hooked/models/fishingSpot.dart';
 
 class CreateTripPage extends StatefulWidget {
   const CreateTripPage({Key? key}) : super(key: key);
@@ -13,11 +15,41 @@ class CreateTripPage extends StatefulWidget {
 
 class _CreateTripPageState extends State<CreateTripPage> {
   final TextEditingController nameController = TextEditingController();
+
   final List<String> selectedFriends = [];
-  final List<String> selectedSpots = [];
   DateTime? selectedDate;
 
+  List<FishingSpot> _allSpots = [];
+
+  FishingSpot? _selectedSpot;
+
   final TripService tripService = TripService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadFishingSpots();
+  }
+
+  Future<void> _loadFishingSpots() async {
+    try {
+      final QuerySnapshot snapshot = await FirebaseFirestore.instance
+          .collection('FishingSpot') //collection name!!
+          .get();
+
+      final spots = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        return FishingSpot.fromMap(data, doc.id);
+      }).toList();
+
+      setState(() {
+        _allSpots = spots;
+      });
+    } catch (e) {
+      print('Error loading fishing spots: $e');
+    }
+  }
 
   void pickDate(BuildContext context) async {
     final pickedDate = await showDatePicker(
@@ -26,7 +58,6 @@ class _CreateTripPageState extends State<CreateTripPage> {
       firstDate: DateTime.now(),
       lastDate: DateTime(2100),
     );
-
     if (pickedDate != null) {
       setState(() {
         selectedDate = pickedDate;
@@ -36,22 +67,19 @@ class _CreateTripPageState extends State<CreateTripPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Grab the same color used in fish.dart:
     Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
-    final currentUser = FirebaseAuth.instance.currentUser;
+    final currentUser = _auth.currentUser;
 
     return Scaffold(
       appBar: AppBar(
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
-        ),
+        leading: Builder(builder: (BuildContext context) {
+          return IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          );
+        }),
         title: const Text('Create Trip'),
         backgroundColor: primaryColor,
         actions: const [ThemeToggleWidget()],
@@ -60,17 +88,18 @@ class _CreateTripPageState extends State<CreateTripPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: currentUser == null
-            ? const Center(
-                child: Text('Please log in to create a trip.'),
-              )
+            ? const Center(child: Text('Please log in to create a trip.'))
             : Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Trip Name
                   TextField(
                     controller: nameController,
                     decoration: const InputDecoration(labelText: 'Trip Name'),
                   ),
                   const SizedBox(height: 20),
+
+                  // Select Date
                   ElevatedButton(
                     onPressed: () => pickDate(context),
                     child: Text(
@@ -80,20 +109,46 @@ class _CreateTripPageState extends State<CreateTripPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
+
+                  // Add Friends (placeholder)
                   ElevatedButton(
                     onPressed: () {
-                      // Show a dialog or another screen for selecting friends
+                      //Placeholder
                     },
                     child: Text('Add Friends (${selectedFriends.length})'),
                   ),
                   const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      // Show a dialog or screen for selecting fishing spots
-                    },
-                    child: Text('Add Spots (${selectedSpots.length})'),
+
+                  // Add Spots: We'll show a single dropdown for picking one spot
+                  const Text(
+                    'Select a Fishing Spot:',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
+                  const SizedBox(height: 8),
+
+                  if (_allSpots.isEmpty)
+                    const Text('No fishing spots found or still loading...')
+                  else
+                    DropdownButton<FishingSpot>(
+                      value: _selectedSpot,
+                      hint: const Text('Choose a spot'),
+                      items: _allSpots.map((spot) {
+                        return DropdownMenuItem<FishingSpot>(
+                          value: spot,
+                          // The 'title' from your model
+                          child: Text(spot.title ?? 'Untitled Spot'),
+                        );
+                      }).toList(),
+                      onChanged: (FishingSpot? newValue) {
+                        setState(() {
+                          _selectedSpot = newValue;
+                        });
+                      },
+                    ),
+
                   const Spacer(),
+
+                  // Create Trip button
                   ElevatedButton(
                     onPressed: () async {
                       if (selectedDate == null || nameController.text.isEmpty) {
@@ -105,11 +160,16 @@ class _CreateTripPageState extends State<CreateTripPage> {
                         return;
                       }
 
+                      final List<String> spotsToAdd = [];
+                      if (_selectedSpot != null) {
+                        spotsToAdd.add(_selectedSpot!.id!);
+                      }
+
                       await tripService.createTrip(
                         creatorId: currentUser.uid,
                         name: nameController.text.trim(),
                         participants: selectedFriends,
-                        spots: selectedSpots,
+                        spots: spotsToAdd,
                         date: selectedDate!,
                       );
 
