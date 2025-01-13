@@ -6,7 +6,7 @@ class User {
   String? _surname;
   String? _email;
   List<DocumentReference>? _contacts;
-  List<DocumentReference>? _friendRequests; // Field for friend requests
+  List<DocumentReference>? _friendRequests;
 
   User({
     String? id,
@@ -61,7 +61,7 @@ class User {
       'surname': _surname,
       'email': _email,
       'contacts': _contacts,
-      'friendRequests': _friendRequests, // Include friend requests in map
+      'friendRequests': _friendRequests,
     };
   }
 

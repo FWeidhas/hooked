@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({super.key});
+  const CustomDrawer({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,6 @@ class CustomDrawer extends StatelessWidget {
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 10),
                 Image.asset(
@@ -53,28 +52,26 @@ class CustomDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/fish');
             },
           ),
-          ListTile(
-          leading: const Icon(Icons.group),
-          title: const Text('Friends'),
-          onTap: () {
-           Navigator.pop(context);
-           Navigator.pushNamed(context, '/friends');
-          },
-        ),
+                    ListTile(
+            leading: const Icon(Icons.group),
+            title: const Text('Friends'),
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/friends');
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.trip_origin),
             title: const Text('Create Trip'),
             onTap: () {
-              print('Navigiere zu Trips');
               Navigator.pop(context);
               Navigator.pushNamed(context, '/trips');
             },
           ),
           ListTile(
             leading: const Icon(Icons.list),
-            title: const Text('My Trips'), // Eintrag für die Trips-Liste
+            title: const Text('My Trips'),
             onTap: () {
-              print('Navigiere zu Trips List');
               Navigator.pop(context);
               Navigator.pushNamed(context, '/trips_list');
             },

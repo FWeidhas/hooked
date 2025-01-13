@@ -1,42 +1,58 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class FriendService {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _firestore = FirebaseFirestore.instance;
 
+  /// Send a friend request by [receiverEmail]:
+  /// 1) Find the user with that email
+  /// 2) Add the current user's UID to their 'friendRequests'
   Future<void> sendFriendRequest(String senderId, String receiverEmail) async {
-    final usersCollection = _firestore.collection('users');
-    
-    final querySnapshot = await usersCollection.where('email', isEqualTo: receiverEmail).get();
+    final users = _firestore.collection('users');
+    final querySnapshot = await users.where('email', isEqualTo: receiverEmail).get();
 
     if (querySnapshot.docs.isEmpty) {
-      throw Exception('Benutzer mit dieser E-Mail wurde nicht gefunden.');
+      throw Exception('User with email "$receiverEmail" not found.');
     }
 
-    final receiverId = querySnapshot.docs.first.id;
+    final receiverDoc = querySnapshot.docs.first;
+    final receiverId = receiverDoc.id;
 
-    await usersCollection.doc(receiverId).update({
+    // Optional: prevent sending request to yourself
+    if (receiverId == senderId) {
+      throw Exception('Cannot send a friend request to yourself.');
+    }
+
+    // Add senderId to the receiver's friendRequests array
+    await users.doc(receiverId).update({
       'friendRequests': FieldValue.arrayUnion([senderId]),
     });
   }
 
-  Future<void> acceptFriendRequest(String userId, String friendId) async {
-    final usersCollection = _firestore.collection('users');
+  /// Accept a friend request:
+  /// - Remove [friendId] from the current user's 'friendRequests'
+  /// - Add [friendId] to current user's 'contacts'
+  /// - Add current user to [friendId]'s 'contacts'
+  Future<void> acceptFriendRequest(String currentUserId, String friendId) async {
+    final users = _firestore.collection('users');
 
-    await usersCollection.doc(userId).update({
+    // Remove the request from current user
+    await users.doc(currentUserId).update({
       'friendRequests': FieldValue.arrayRemove([friendId]),
-      'friends': FieldValue.arrayUnion([friendId]),
+      'contacts': FieldValue.arrayUnion([friendId]),
     });
 
-    await usersCollection.doc(friendId).update({
-      'friends': FieldValue.arrayUnion([userId]),
+    // Add currentUserId to friend’s contacts
+    await users.doc(friendId).update({
+      'contacts': FieldValue.arrayUnion([currentUserId]),
     });
   }
 
-  Future<void> declineFriendRequest(String userId, String friendId) async {
-    final usersCollection = _firestore.collection('users');
-
-    // Entferne die Anfrage
-    await usersCollection.doc(userId).update({
+  /// Decline a friend request:
+  /// - Just remove [friendId] from current user's 'friendRequests'
+  Future<void> declineFriendRequest(String currentUserId, String friendId) async {
+    final users = _firestore.collection('users');
+    await users.doc(currentUserId).update({
       'friendRequests': FieldValue.arrayRemove([friendId]),
     });
   }

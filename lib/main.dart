@@ -1,3 +1,4 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,13 +13,14 @@ import 'theme.dart';
 import 'pages/map.dart';
 import 'pages/fishing_spots.dart';
 import 'pages/fish.dart';
-import 'pages/friend_request_page.dart';
 import 'pages/create_trip_page.dart';
 import 'pages/trips_list_page.dart';
 import 'controller/themecontroller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hooked/pages/friend_page.dart';
+import 'package:hooked/pages/add_friend_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,9 +30,9 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print("Firebase erfolgreich initialisiert.");
+    print("Firebase successfully initialized.");
   } catch (e) {
-    print("Fehler bei der Firebase-Initialisierung: $e");
+    print("Error initializing Firebase: $e");
   }
 
   await dotenv.load(fileName: "assets/.env");
@@ -41,7 +43,7 @@ void main() async {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -64,53 +66,12 @@ class MainApp extends StatelessWidget {
           '/map': (context) => const AuthGuard(child: FishingMap()),
           '/fishing_spots': (context) => AuthGuard(child: FishingSpots()),
           '/fish': (context) => AuthGuard(child: FishPage()),
-          '/friends': (context) {
-            final currentUser = FirebaseAuth.instance.currentUser;
-
-            if (currentUser == null) {
-              return Scaffold(
-                appBar: AppBar(title: const Text('Freundesanfragen')),
-                body: const Center(child: Text('Du bist nicht eingeloggt.')),
-              );
-            }
-
-            return StreamBuilder<DocumentSnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(currentUser.uid)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Scaffold(
-                    appBar: AppBar(title: const Text('Freundesanfragen')),
-                    body: const Center(child: CircularProgressIndicator()),
-                  );
-                }
-
-                if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
-                  return Scaffold(
-                    appBar: AppBar(title: const Text('Freundesanfragen')),
-                    body: const Center(child: Text('Keine Benutzerdaten gefunden.')),
-                  );
-                }
-
-                final userDoc = snapshot.data!;
-                final userData = userDoc.data() as Map<String, dynamic>;
-
-                final friendRequests =
-                    userData.containsKey('friendRequests')
-                        ? List<String>.from(userData['friendRequests'] ?? [])
-                        : <String>[];
-
-                return FriendRequestsPage(friendRequests: friendRequests);
-              },
-            );
-          },
           '/trips': (context) => CreateTripPage(),
           '/trips_list': (context) => const TripsListPage(),
+          '/friends': (context) => const AuthGuard(child: FriendsPage()),
+          '/add_friend': (context) => const AuthGuard(child: AddFriendPage()),
           '/weather': (context) {
-            final args = ModalRoute.of(context)!.settings.arguments
-                as Map<String, dynamic>;
+            final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
             return FishingSpotWeatherScreen(
               latitude: args['latitude'],
               longitude: args['longitude'],
