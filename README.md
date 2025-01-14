@@ -25,6 +25,14 @@
 - Upload a photo of the location to share its beauty with others.
 - List the types of fish that can be caught at the spot.
 
+### 👥 Add Friends
+
+- Add a new friend via their email.
+
+### 🏞️ Create Trips
+
+-Create a trip to your chosen fishing spot, select a date and a friend to invite.
+
 ### 🌦️ Check the Weather
 
 - Each fishing spot has a dedicated **"Weather Forecast"** button.
