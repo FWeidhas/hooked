@@ -92,6 +92,13 @@
 ![Hooked_Routing_Light](/assets/hooked_app_pictures/Map_Routing/Hooked_Routing_Light.png)
 ![Hooked_Routing_Dark](/assets/hooked_app_pictures/Map_Routing/Hooked_Routing_Dark.png)
 
+### Friend Screens
+
+
+
+### Trip Screens
+
+
 ### Fishing Spots Screens
 ![Hooked_Fishing_Spots_Light](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Light.png)
 ![Hooked_Fishing_Spots_Dark](/assets/hooked_app_pictures/Fishing_Spot/Hooked_Fishing_Spots_Dark.png)
