@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hooked/database/trip_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../drawer.dart';
 import '../components/themetoggle.dart';
 import 'package:hooked/models/fishingSpot.dart';
 
@@ -20,7 +19,6 @@ class _CreateTripPageState extends State<CreateTripPage> {
   DateTime? selectedDate;
 
   List<FishingSpot> _allSpots = [];
-
   FishingSpot? _selectedSpot;
 
   final TripService tripService = TripService();
@@ -35,7 +33,7 @@ class _CreateTripPageState extends State<CreateTripPage> {
   Future<void> _loadFishingSpots() async {
     try {
       final QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('FishingSpot') //collection name!!
+          .collection('FishingSpot')
           .get();
 
       final spots = snapshot.docs.map((doc) {
@@ -67,24 +65,15 @@ class _CreateTripPageState extends State<CreateTripPage> {
 
   @override
   Widget build(BuildContext context) {
-    Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
     final currentUser = _auth.currentUser;
+    Color primaryColor = Theme.of(context).colorScheme.primaryContainer; 
 
     return Scaffold(
       appBar: AppBar(
-        leading: Builder(builder: (BuildContext context) {
-          return IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          );
-        }),
         title: const Text('Create Trip'),
         backgroundColor: primaryColor,
         actions: const [ThemeToggleWidget()],
       ),
-      drawer: const CustomDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: currentUser == null
@@ -113,13 +102,13 @@ class _CreateTripPageState extends State<CreateTripPage> {
                   // Add Friends (placeholder)
                   ElevatedButton(
                     onPressed: () {
-                      //Placeholder
+                      // Placeholder
                     },
                     child: Text('Add Friends (${selectedFriends.length})'),
                   ),
                   const SizedBox(height: 20),
 
-                  // Add Spots: We'll show a single dropdown for picking one spot
+                  // Single dropdown for picking one spot
                   const Text(
                     'Select a Fishing Spot:',
                     style: TextStyle(fontWeight: FontWeight.bold),
@@ -135,7 +124,6 @@ class _CreateTripPageState extends State<CreateTripPage> {
                       items: _allSpots.map((spot) {
                         return DropdownMenuItem<FishingSpot>(
                           value: spot,
-                          // The 'title' from your model
                           child: Text(spot.title ?? 'Untitled Spot'),
                         );
                       }).toList(),
@@ -160,7 +148,7 @@ class _CreateTripPageState extends State<CreateTripPage> {
                         return;
                       }
 
-                      final List<String> spotsToAdd = [];
+                      final spotsToAdd = <String>[];
                       if (_selectedSpot != null) {
                         spotsToAdd.add(_selectedSpot!.id!);
                       }
