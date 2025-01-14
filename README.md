@@ -31,7 +31,7 @@
 
 ### 🏞️ Create Trips
 
--Create a trip to your chosen fishing spot, select a date and a friend to invite.
+- Create a trip to your chosen fishing spot, select a date and a friend to invite.
 
 ### 🌦️ Check the Weather
 
