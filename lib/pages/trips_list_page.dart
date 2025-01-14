@@ -30,6 +30,8 @@ class TripsListPage extends StatelessWidget {
         actions: const [ThemeToggleWidget()],
       ),
       drawer: const CustomDrawer(),
+
+      // The main content
       body: currentUser == null
           ? const Center(
               child: Text('Please log in to view your trips.'),
@@ -62,7 +64,7 @@ class TripsListPage extends StatelessWidget {
                     try {
                       dateTime = DateTime.parse(dateString);
                     } catch (e) {
-                      // If parsing fails, we just won't crash
+                      // If parsing fails, do nothing special
                     }
 
                     // Format the date if parse was successful
@@ -78,8 +80,7 @@ class TripsListPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                TripDetailsPage(tripId: trip.id),
+                            builder: (context) => TripDetailsPage(tripId: trip.id),
                           ),
                         );
                       },
@@ -88,6 +89,16 @@ class TripsListPage extends StatelessWidget {
                 );
               },
             ),
+
+      // Add the floatingActionButton to create a new Trip
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: primaryColor,
+        onPressed: () {
+          // Navigate to the create trip page
+          Navigator.pushNamed(context, '/trips');
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 }

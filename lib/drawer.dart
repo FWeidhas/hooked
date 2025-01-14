@@ -52,20 +52,12 @@ class CustomDrawer extends StatelessWidget {
               Navigator.pushNamed(context, '/fish');
             },
           ),
-                    ListTile(
+          ListTile(
             leading: const Icon(Icons.group),
             title: const Text('Friends'),
             onTap: () {
               Navigator.pop(context);
               Navigator.pushNamed(context, '/friends');
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.trip_origin),
-            title: const Text('Create Trip'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.pushNamed(context, '/trips');
             },
           ),
           ListTile(
