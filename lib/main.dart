@@ -1,4 +1,3 @@
-// main.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -21,6 +20,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooked/pages/friend_page.dart';
 import 'package:hooked/pages/add_friend_page.dart';
+
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,18 +49,20 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ThemeController themeController = Get.find();
-
-    TextTheme textTheme = createTextTheme(context, "Roboto", "Roboto");
-    MaterialTheme theme = MaterialTheme(textTheme);
+    final themeController = Get.find<ThemeController>();
+    final textTheme = createTextTheme(context, "Roboto", "Roboto");
+    final myTheme = MaterialTheme(textTheme);
 
     return Obx(() {
       return MaterialApp(
         title: 'Hooked',
-        theme: theme.light(),
-        darkTheme: theme.dark(),
+        theme: myTheme.light(),
+        darkTheme: myTheme.dark(),
         debugShowCheckedModeBanner: false,
         themeMode: themeController.themeMode,
+
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
+
         home: const AuthCheck(),
         routes: {
           '/login': (context) => const LoginPage(),
@@ -71,7 +75,8 @@ class MainApp extends StatelessWidget {
           '/friends': (context) => const AuthGuard(child: FriendsPage()),
           '/add_friend': (context) => const AuthGuard(child: AddFriendPage()),
           '/weather': (context) {
-            final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+            final args = ModalRoute.of(context)!.settings.arguments
+                as Map<String, dynamic>;
             return FishingSpotWeatherScreen(
               latitude: args['latitude'],
               longitude: args['longitude'],
