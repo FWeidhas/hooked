@@ -29,6 +29,7 @@ dependencies:
   file_picker: ^5.0.1
   image_picker: ^0.8.4+4
   flutter_polyline_points: ^2.1.0
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -41,4 +42,3 @@ flutter:
   assets:
     - assets/hooked_icon-removebg.png
     - assets/hooked_icon.png
-    - .env
