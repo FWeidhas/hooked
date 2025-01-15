@@ -7,6 +7,7 @@
 - [Features](#features)
 - [Get Started](#get-started)
 - [Image gallery](#image-gallery)
+- [Future Features](#future-features)
 
 ## Features
 
@@ -25,6 +26,10 @@
 - Create a new fishing spot by marking it on the map.
 - Upload a photo of the location to share its beauty with others.
 - List the types of fish that can be caught at the spot.
+
+### 🏞️ Create Trips
+
+- Create a trip to your chosen fishing spot and select a date to create it.
 
 ### 🌦️ Check the Weather
 
@@ -90,8 +95,20 @@
 ![Hooked_Point_Map_Dark](/assets/hooked_app_pictures/Map_Routing/Hooked_Point_Map_Dark.png)
 ![Hooked_Routing_Light](/assets/hooked_app_pictures/Map_Routing/Hooked_Routing_Light.png)
 ![Hooked_Routing_Dark](/assets/hooked_app_pictures/Map_Routing/Hooked_Routing_Dark.png)
-![Hooked_Routing_Map_Light](/assets/hooked_app_pictures/Map_Routing/Hooked_Routing_Map_Light.png)
-![Hooked_Routing_Map_Dark](/assets/hooked_app_pictures/Map_Routing/Hooked_Routing_Map_Dark.png)
+
+### Friend Screens
+![Hooked_Friends_White](assets/hooked_app_pictures/Friends/Friends_white.png)
+![Hooked_Friends_Dark](assets/hooked_app_pictures/Friends/Friends_dark.png)
+![Hooked_addFriends_White](assets/hooked_app_pictures/Friends/addFriends_white.png)
+![Hooked_addFriends_Dark](assets/hooked_app_pictures/Friends/addFriends_dark.png)
+
+### Trip Screens
+![Hooked_Trips_White](assets/hooked_app_pictures/Trip/Trips_white.png)
+![Hooked_Trips_Dark](assets/hooked_app_pictures/Trip/Trips_dark.png)
+![Hooked_Trips_details_White](assets/hooked_app_pictures/Trip/Trips_details_white.png)
+![Hooked_Trips_details_Dark](assets/hooked_app_pictures/Trip/Trips_details_dark.png)
+![Hooked_createTrips_White](assets/hooked_app_pictures/Trip/createTrips_white.png)
+![Hooked_createTrips_Dark](assets/hooked_app_pictures/Trip/createTrips_dark.png)
 
 ### Fishing Spots Screens
 
@@ -110,3 +127,11 @@
 ![Hooked_Fish_Dark](/assets/hooked_app_pictures/Fish/Hooked_Fish_Dark.png)
 ![Hooked_Fish_Edit_Light](/assets/hooked_app_pictures/Fish/Hooked_Fish_Edit_Light.png)
 ![Hooked_Fish_Edit_Dark](/assets/hooked_app_pictures/Fish/Hooked_Fish_Edit_Dark.png)
+
+
+## Future Features
+
+### 👥 Add Friends
+
+- Add a new friend via their email.
+
