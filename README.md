@@ -6,6 +6,7 @@
 - [Features](#features)
 - [Get Started](#get-started)
 - [Image gallery](#image-gallery)
+- [Future Features](#future-features)
 
 ## Features
 
@@ -24,10 +25,6 @@
 - Create a new fishing spot by marking it on the map.
 - Upload a photo of the location to share its beauty with others.
 - List the types of fish that can be caught at the spot.
-
-### 👥 Add Friends
-
-- Add a new friend via their email.
 
 ### 🏞️ Create Trips
 
@@ -122,4 +119,10 @@
 ![Hooked_Fish_Edit_Light](/assets/hooked_app_pictures/Fish/Hooked_Fish_Edit_Light.png)
 ![Hooked_Fish_Edit_Dark](/assets/hooked_app_pictures/Fish/Hooked_Fish_Edit_Dark.png)
 
+
+## Future Features
+
+### 👥 Add Friends
+
+- Add a new friend via their email.
 
