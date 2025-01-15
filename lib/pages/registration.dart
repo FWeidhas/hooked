@@ -66,22 +66,28 @@ class _RegistrationPageState extends State<RegistrationPage> {
     setState(() => _isLoading = true);
 
     try {
+      // 1) Create the user in Firebase Auth
       auth.UserCredential userCredential =
           await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
+      final uid = userCredential.user!.uid;
+
+      // 2) Build our local User model
       User user = User(
-        id: userCredential.user!.uid,
+        id: uid, // Use the Firebase Auth UID
         name: _nameController.text.trim(),
         surname: _surnameController.text.trim(),
         email: _emailController.text.trim(),
         contacts: [],
       );
 
+      // 3) Create the doc in Firestore at `User/<uid>`
       await createUser(user);
 
+      // 4) Show success & navigate back
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -93,7 +99,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
       }
     } on auth.FirebaseAuthException catch (e) {
       String message = 'Registration failed';
-
       switch (e.code) {
         case 'email-already-in-use':
           message = 'This email is already registered';
@@ -177,10 +182,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       children: [
                         Text(
                           'Personal Information',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -218,10 +223,10 @@ class _RegistrationPageState extends State<RegistrationPage> {
                       children: [
                         Text(
                           'Account Details',
-                          style:
-                              Theme.of(context).textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         TextFormField(
@@ -249,7 +254,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                                     : Icons.visibility_off,
                               ),
                               onPressed: () => setState(
-                                  () => _obscurePassword = !_obscurePassword),
+                                () => _obscurePassword = !_obscurePassword,
+                              ),
                             ),
                           ),
                           validator: _validatePassword,
@@ -288,4 +294,4 @@ class _RegistrationPageState extends State<RegistrationPage> {
       ),
     );
   }
-}
+} 

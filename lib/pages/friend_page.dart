@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../drawer.dart';
 import '../components/themetoggle.dart';
 import '../database/friend_service.dart';
+import '../main.dart';
 
 class FriendsPage extends StatefulWidget {
   const FriendsPage({Key? key}) : super(key: key);
@@ -18,7 +19,7 @@ class _FriendsPageState extends State<FriendsPage> {
 
   @override
   Widget build(BuildContext context) {
-    Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
+    final Color primaryColor = Theme.of(context).colorScheme.primaryContainer;
     final currentUser = _auth.currentUser;
 
     if (currentUser == null) {
@@ -78,17 +79,15 @@ class _FriendsPageState extends State<FriendsPage> {
           final userDoc = snapshot.data!;
           final userData = userDoc.data() as Map<String, dynamic>;
 
-          // We assume 'contacts' is array of user IDs for accepted friends
           final List<dynamic> contacts = userData['contacts'] ?? [];
-          // We assume 'friendRequests' is array of user IDs for requests
           final List<dynamic> friendRequests = userData['friendRequests'] ?? [];
 
           return ListView(
             children: [
               const SizedBox(height: 16),
-              _buildFriendsSection(contacts),
-              const Divider(),
               _buildRequestsSection(friendRequests),
+              const Divider(),
+              _buildFriendsSection(contacts),
             ],
           );
         },
@@ -157,63 +156,65 @@ class _FriendsPageState extends State<FriendsPage> {
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
-          ...requestIds.map((requesterId) => FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance
-                    .collection('User')
-                    .doc(requesterId)
-                    .get(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData || !snapshot.data!.exists) {
-                    return const ListTile(
-                      title: Text('Unknown request'),
-                    );
-                  }
-                  final requesterData =
-                      snapshot.data!.data() as Map<String, dynamic>;
-                  final requesterEmail = requesterData['email'] ?? 'No email';
-
-                  return ListTile(
-                    leading: const Icon(Icons.person_outline),
-                    title: Text(requesterEmail),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.check),
-                          onPressed: () async {
-                            final currentUser = FirebaseAuth.instance.currentUser;
-                            if (currentUser != null) {
-                              await _friendService.acceptFriendRequest(
-                                currentUser.uid,
-                                requesterId,
-                              );
-                              // Optional: show a SnackBar
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Accepted $requesterEmail')),
-                              );
-                            }
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close),
-                          onPressed: () async {
-                            final currentUser = FirebaseAuth.instance.currentUser;
-                            if (currentUser != null) {
-                              await _friendService.declineFriendRequest(
-                                currentUser.uid,
-                                requesterId,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Declined $requesterEmail')),
-                              );
-                            }
-                          },
-                        ),
-                      ],
-                    ),
+          ...requestIds.map((requesterId) {
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('User')
+                  .doc(requesterId)
+                  .get(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData || !snapshot.data!.exists) {
+                  return const ListTile(
+                    title: Text('Unknown request'),
                   );
-                },
-              ))
+                }
+                final requesterData =
+                    snapshot.data!.data() as Map<String, dynamic>;
+                final requesterEmail = requesterData['email'] ?? 'No email';
+
+                return ListTile(
+                  leading: const Icon(Icons.person_outline),
+                  title: Text(requesterEmail),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.check),
+                        onPressed: () async {
+                          final currentUser = FirebaseAuth.instance.currentUser;
+                          if (currentUser != null) {
+                            await _friendService.acceptFriendRequest(
+                              currentUser.uid,
+                              requesterId,
+                            );
+                            // 2) Use the global scaffoldMessenger
+                            rootScaffoldMessengerKey.currentState?.showSnackBar(
+                              SnackBar(content: Text('Accepted $requesterEmail')),
+                            );
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () async {
+                          final currentUser = FirebaseAuth.instance.currentUser;
+                          if (currentUser != null) {
+                            await _friendService.declineFriendRequest(
+                              currentUser.uid,
+                              requesterId,
+                            );
+                            rootScaffoldMessengerKey.currentState?.showSnackBar(
+                              SnackBar(content: Text('Declined $requesterEmail')),
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          }).toList(),
         ],
       ),
     );

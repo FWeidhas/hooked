@@ -35,8 +35,9 @@ Future<model.User?> getUser(String docId) async {
 
 Future<bool> createUser(model.User user) async {
   try {
-    await userRef.add(user.toMap());
-    print('User created successfully');
+    // Use doc(user.id).set(...) so the doc ID == user.id (Auth UID)
+    await userRef.doc(user.id).set(user.toMap());
+    print('User created successfully at doc ID = ${user.id}');
     return true;
   } catch (e) {
     print('Error creating user: $e');
@@ -77,7 +78,7 @@ Future<bool> doesUserExist(String email) async {
   }
 }
 
-// Method to fetch the user for a fishing spot
+// For fishing spots (unchanged)
 Future<model.User?> getUserForSpot(FishingSpot fishingSpot) async {
   if (fishingSpot.creator == null) {
     return null;
