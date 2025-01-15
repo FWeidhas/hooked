@@ -64,7 +64,7 @@ class _FriendsPageState extends State<FriendsPage> {
       ),
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
-            .collection('users')
+            .collection('User')
             .doc(currentUser.uid)
             .snapshots(),
         builder: (context, snapshot) {
@@ -117,7 +117,7 @@ class _FriendsPageState extends State<FriendsPage> {
           // Build a ListView for friend IDs
           ...friendIds.map((friendId) => FutureBuilder<DocumentSnapshot>(
                 future: FirebaseFirestore.instance
-                    .collection('users')
+                    .collection('User')
                     .doc(friendId)
                     .get(),
                 builder: (context, snapshot) {
@@ -159,7 +159,7 @@ class _FriendsPageState extends State<FriendsPage> {
           const SizedBox(height: 8),
           ...requestIds.map((requesterId) => FutureBuilder<DocumentSnapshot>(
                 future: FirebaseFirestore.instance
-                    .collection('users')
+                    .collection('User')
                     .doc(requesterId)
                     .get(),
                 builder: (context, snapshot) {
