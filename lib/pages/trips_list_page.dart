@@ -97,6 +97,7 @@ class _TripsListPageState extends State<TripsListPage> {
                                 .doc(tripDoc.id)
                                 .delete();
 
+                            // Use global messenger to avoid deactivated context
                             rootScaffoldMessengerKey.currentState?.showSnackBar(
                               const SnackBar(content: Text('Trip deleted.')),
                             );
@@ -176,11 +177,20 @@ class TripDetailsPage extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text('Date: $formattedDate'),
                 const SizedBox(height: 10),
-                Text('Participants: ${participants.join(', ')}'),
+
+                // Show participant emails, not just IDs
+                const Text(
+                  'Participants:',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                buildParticipantsSection(participants),
+
                 const SizedBox(height: 10),
                 if (spots.isEmpty)
                   const Text('Spot: None selected')
                 else
+                  // For now, we show only the first spot, if you allow multiple
+                  // you can display them in a loop
                   FutureBuilder<DocumentSnapshot>(
                     future: FirebaseFirestore.instance
                         .collection('FishingSpot')
@@ -208,6 +218,33 @@ class TripDetailsPage extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  /// Build a Column of participant emails by loading each doc from User/<id>.
+  Widget buildParticipantsSection(List<dynamic> participantIds) {
+    if (participantIds.isEmpty) {
+      return const Text('None');
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: participantIds.map((pid) {
+        return FutureBuilder<DocumentSnapshot>(
+          future: FirebaseFirestore.instance
+              .collection('User')
+              .doc(pid)
+              .get(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return const Text('• Unknown participant');
+            }
+            final data = snapshot.data!.data() as Map<String, dynamic>;
+            final email = data['email'] ?? 'No email';
+            return Text('• $email');
+          },
+        );
+      }).toList(),
     );
   }
 }
