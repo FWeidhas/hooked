@@ -7,7 +7,7 @@ class SendFriendRequestPage extends StatelessWidget {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<void> sendFriendRequest(String senderId, String receiverEmail) async {
-    final usersCollection = firestore.collection('users');
+    final usersCollection = firestore.collection('User');
 
     final querySnapshot = await usersCollection.where('email', isEqualTo: receiverEmail).get();
 

@@ -8,7 +8,7 @@ class FriendService {
   /// 1) Find the user with that email
   /// 2) Add the current user's UID to their 'friendRequests'
   Future<void> sendFriendRequest(String senderId, String receiverEmail) async {
-    final users = _firestore.collection('users');
+    final users = _firestore.collection('User');
     final querySnapshot = await users.where('email', isEqualTo: receiverEmail).get();
 
     if (querySnapshot.docs.isEmpty) {
@@ -34,7 +34,7 @@ class FriendService {
   /// - Add [friendId] to current user's 'contacts'
   /// - Add current user to [friendId]'s 'contacts'
   Future<void> acceptFriendRequest(String currentUserId, String friendId) async {
-    final users = _firestore.collection('users');
+    final users = _firestore.collection('User');
 
     // Remove the request from current user
     await users.doc(currentUserId).update({
@@ -51,7 +51,7 @@ class FriendService {
   /// Decline a friend request:
   /// - Just remove [friendId] from current user's 'friendRequests'
   Future<void> declineFriendRequest(String currentUserId, String friendId) async {
-    final users = _firestore.collection('users');
+    final users = _firestore.collection('User');
     await users.doc(currentUserId).update({
       'friendRequests': FieldValue.arrayRemove([friendId]),
     });
