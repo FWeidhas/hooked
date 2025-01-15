@@ -42,4 +42,3 @@ flutter:
   assets:
     - assets/hooked_icon-removebg.png
     - assets/hooked_icon.png
-    - assets/.env

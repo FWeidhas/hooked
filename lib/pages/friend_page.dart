@@ -66,6 +66,7 @@ class _FriendsPageState extends State<FriendsPage> {
       body: StreamBuilder<DocumentSnapshot>(
         stream: FirebaseFirestore.instance
             .collection('User')
+            .collection('User')
             .doc(currentUser.uid)
             .snapshots(),
         builder: (context, snapshot) {
@@ -91,6 +92,49 @@ class _FriendsPageState extends State<FriendsPage> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildFriendsSection(List<dynamic> friendIds) {
+    if (friendIds.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: Text('No friends yet.'),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'My Friends',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          // Build a ListView for friend IDs
+          ...friendIds.map((friendId) => FutureBuilder<DocumentSnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection('User')
+                    .doc(friendId)
+                    .get(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return const ListTile(
+                      title: Text('Unknown friend'),
+                    );
+                  }
+                  final friendData = snapshot.data!.data() as Map<String, dynamic>;
+                  final friendEmail = friendData['email'] ?? 'No email';
+                  return ListTile(
+                    leading: const Icon(Icons.person),
+                    title: Text(friendEmail),
+                  );
+                },
+              ))
+        ],
       ),
     );
   }

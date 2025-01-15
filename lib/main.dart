@@ -37,7 +37,7 @@ void main() async {
     print("Error initializing Firebase: $e");
   }
 
-  await dotenv.load(fileName: "assets/.env");
+  await dotenv.load(fileName: ".env");
 
   Get.put(ThemeController());
 
