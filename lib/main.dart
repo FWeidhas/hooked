@@ -12,19 +12,32 @@ import 'theme.dart';
 import 'pages/map.dart';
 import 'pages/fishing_spots.dart';
 import 'pages/fish.dart';
+import 'pages/create_trip_page.dart';
+import 'pages/trips_list_page.dart';
 import 'controller/themecontroller.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hooked/pages/friend_page.dart';
+import 'package:hooked/pages/add_friend_page.dart';
+
+final GlobalKey<ScaffoldMessengerState> rootScaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 void main() async {
-  // Ensure Flutter bindings are initialized
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print("Firebase successfully initialized.");
+  } catch (e) {
+    print("Error initializing Firebase: $e");
+  }
 
   await dotenv.load(fileName: ".env");
-
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   Get.put(ThemeController());
 
@@ -32,25 +45,24 @@ void main() async {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // Get the current theme mode from the ThemeController
-    ThemeController themeController = Get.find();
-
-    TextTheme textTheme = createTextTheme(context, "Roboto", "Roboto");
-    MaterialTheme theme = MaterialTheme(textTheme);
+    final themeController = Get.find<ThemeController>();
+    final textTheme = createTextTheme(context, "Roboto", "Roboto");
+    final myTheme = MaterialTheme(textTheme);
 
     return Obx(() {
-      // Rebuild the MaterialApp whenever the theme changes
       return MaterialApp(
         title: 'Hooked',
-        theme: theme.light(),
-        darkTheme: theme.dark(),
+        theme: myTheme.light(),
+        darkTheme: myTheme.dark(),
         debugShowCheckedModeBanner: false,
-        themeMode:
-            themeController.themeMode, // Bind theme mode to GetX controller
+        themeMode: themeController.themeMode,
+
+        scaffoldMessengerKey: rootScaffoldMessengerKey,
+
         home: const AuthCheck(),
         routes: {
           '/login': (context) => const LoginPage(),
@@ -58,6 +70,10 @@ class MainApp extends StatelessWidget {
           '/map': (context) => const AuthGuard(child: FishingMap()),
           '/fishing_spots': (context) => AuthGuard(child: FishingSpots()),
           '/fish': (context) => AuthGuard(child: FishPage()),
+          '/trips': (context) => CreateTripPage(),
+          '/trips_list': (context) => const TripsListPage(),
+          '/friends': (context) => const AuthGuard(child: FriendsPage()),
+          '/add_friend': (context) => const AuthGuard(child: AddFriendPage()),
           '/weather': (context) {
             final args = ModalRoute.of(context)!.settings.arguments
                 as Map<String, dynamic>;
