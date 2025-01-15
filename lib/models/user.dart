@@ -56,14 +56,17 @@ class User {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'name': _name,
-      'surname': _surname,
-      'email': _email,
-      'contacts': _contacts,
-      'friendRequests': _friendRequests,
-    };
-  }
+  final map = <String, dynamic>{
+    'name': _name,
+    'surname': _surname,
+    'email': _email,
+  };
+  
+  if (_contacts != null) map['contacts'] = _contacts;
+  if (_friendRequests != null) map['friendRequests'] = _friendRequests;
+  
+  return map;
+}
 
   // Add fromMap constructor
   factory User.fromMap(Map<String, dynamic> map, String id) {
@@ -72,12 +75,12 @@ class User {
       name: map['name'],
       surname: map['surname'],
       email: map['email'],
-      contacts: map['contacts'] != null
-          ? List<DocumentReference>.from(map['contacts'])
-          : [],
+      contacts: map['contacts'] != null 
+          ? (map['contacts'] as List).map((item) => item as DocumentReference).toList()
+          : null,
       friendRequests: map['friendRequests'] != null
-          ? List<DocumentReference>.from(map['friendRequests'])
-          : [],
-    );
+          ? (map['friendRequests'] as List).map((item) => item as DocumentReference).toList()
+          : null,
+   );
   }
 }
